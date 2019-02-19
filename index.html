@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Mongo Playground</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.css" />
+  <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+  <style>
+    #javascript-editor {
+      height: 705px;
+      width: 900;
+    }
+
+    #run {
+      position: absolute;
+      right: 21px;
+      bottom: 21px;
+      z-index: 5;
+    }
+  </style>
+</head>
+
+<body>
+  <button onclick="runCode()" class="button" id="run">Run</button>
+  <div class="container">
+    <input type="text" class="input" id="mongo_uri" value="mongodb://localhost/test">
+    <div id="javascript-editor">
+      const tags = await db.collection('tags').find({}).limit(1).toArray();
+      console.log(tags)
+    </div>
+  </div>
+
+  <script>
+    var ace = require('brace');
+    require('brace/mode/javascript');
+    require('brace/theme/monokai');
+    var editor = ace.edit('javascript-editor');
+    editor.getSession().setMode('ace/mode/javascript');
+    editor.setTheme('ace/theme/monokai');
+
+    const Service = require("./renderer.js");
+     async function runCode() {
+      try {
+        const code = editor.getValue();
+        const mongo_uri = document.querySelector('#mongo_uri').value;
+        const client = await Service.Adapter.getMongoClient(mongo_uri);
+        var db = client.db();
+        eval(`async function main(db){${code}}; main(db);`)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,5 @@
+node_modules
+stages/*
+dist
+.DS_Store
+platforms
