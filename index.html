@@ -18,13 +18,43 @@
       bottom: 21px;
       z-index: 5;
     }
+    body > div > div.columns {
+      margin-top: 0;
+    }
+    body > div > div.columns > div.column.is-9 {
+      margin-left: 9px;
+    }
   </style>
 </head>
 
 <body>
   <button onclick="runCode()" class="button" id="run">Run</button>
   <div class="container">
-    <input type="text" class="input" id="mongo_uri" value="mongodb://localhost/test">
+    <div class="columns">
+      <div class="column is-9">
+        <input type="text" class="input" id="mongo_uri" value="mongodb://localhost/test">
+      </div>
+      <div class="column is-1">
+        <button class="button" onclick="addFavorites()">Add</button>
+      </div>
+      <div class="column">
+        <div id="favorites" onclick="toggleFavorites()" class="dropdown ">
+          <div class="dropdown-trigger">
+            <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+              <span>Favorites</span>
+              <span class="icon is-small">
+                <i class="fas fa-angle-down" aria-hidden="true"></i>
+              </span>
+            </button>
+          </div>
+          <div class="dropdown-menu" role="menu">
+            <div class="dropdown-content" id="dropdown-favorites">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="javascript-editor">
       const tags = await db.collection('tags').find({}).limit(1).toArray();
       console.log(tags)
@@ -40,7 +70,7 @@
     editor.setTheme('ace/theme/monokai');
 
     const Service = require("./renderer.js");
-     async function runCode() {
+    async function runCode() {
       try {
         const code = editor.getValue();
         const mongo_uri = document.querySelector('#mongo_uri').value;
@@ -51,6 +81,32 @@
         console.error(error)
       }
     }
+
+    function toggleFavorites() {
+      document.querySelector("#favorites").classList.toggle("is-active");
+    }
+
+    function addFavorites() {
+      let favorites = Service.store.get('favorites');
+      if (!favorites) favorites = [];
+      const mongo_uri = document.querySelector('#mongo_uri').value;
+      favorites.push(mongo_uri);
+      Service.store.set('favorites', favorites);
+      updateFavoritesView();
+    }
+
+    function getFavorites() {
+      return Service.store.get('favorites');;
+    }
+
+    function updateFavoritesView(){
+      const favorites =  getFavorites();
+      const dropdown = document.querySelector('#dropdown-favorites')
+      dropdown.innerHTML = favorites.map(f=>` <a class="dropdown-item">${f}</a>`).join('')
+    }
+
+    updateFavoritesView();
+
   </script>
 </body>
 
