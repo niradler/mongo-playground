@@ -28,85 +28,92 @@
 </head>
 
 <body>
-  <button onclick="runCode()" class="button" id="run">Run</button>
-  <div class="container">
-    <div class="columns">
-      <div class="column is-9">
-        <input type="text" class="input" id="mongo_uri" value="mongodb://localhost/test">
-      </div>
-      <div class="column is-1">
-        <button class="button" onclick="addFavorites()">Add</button>
-      </div>
-      <div class="column">
-        <div id="favorites" onclick="toggleFavorites()" class="dropdown ">
-          <div class="dropdown-trigger">
-            <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
-              <span>Favorites</span>
-              <span class="icon is-small">
-                <i class="fas fa-angle-down" aria-hidden="true"></i>
-              </span>
-            </button>
-          </div>
-          <div class="dropdown-menu" role="menu">
-            <div class="dropdown-content" id="dropdown-favorites">
+  <div id="app">
+    <button onclick="runCode()" class="button" id="run">Run</button>
+    <div class="container">
+      <div class="columns">
+        <div class="column is-9">
+          <input type="text" class="input" id="mongo_uri" value="mongodb://localhost/test">
+        </div>
+        <div class="column is-1">
+          <button class="button" onclick="addFavorites()">Add</button>
+        </div>
+        <div class="column">
+          <div id="favorites" v-on:click="toggleFavorites" class="dropdown ">
+            <div class="dropdown-trigger">
+              <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                <span>Favorites</span>
+                <span class="icon is-small">
+                  <i class="fas fa-angle-down" aria-hidden="true"></i>
+                </span>
+              </button>
+            </div>
+            <div class="dropdown-menu" role="menu">
+              <div class="dropdown-content" id="dropdown-favorites">
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div id="javascript-editor">
-      const tags = await db.collection('tags').find({}).limit(1).toArray();
-      console.log(tags)
+      <div id="javascript-editor">
+        const tags = await db.collection('tags').find({}).limit(1).toArray();
+        console.log(tags)
+      </div>
     </div>
   </div>
-
+  <script src="https://cdn.jsdelivr.net/npm/vue"></script>
   <script>
     var ace = require('brace');
     require('brace/mode/javascript');
     require('brace/theme/monokai');
-    var editor = ace.edit('javascript-editor');
-    editor.getSession().setMode('ace/mode/javascript');
-    editor.setTheme('ace/theme/monokai');
+    const Services = require("./renderer.js");
 
-    const Service = require("./renderer.js");
-    async function runCode() {
-      try {
-        const code = editor.getValue();
-        const mongo_uri = document.querySelector('#mongo_uri').value;
-        const client = await Service.Adapter.getMongoClient(mongo_uri);
-        var db = client.db();
-        eval(`async function main(db){${code}}; main(db);`)
-      } catch (error) {
-        console.error(error)
+    const app = new Vue({
+      el: '#app',
+      data: {
+        favorites: []
+      },
+      methods: {
+        runCode: async function () {
+          try {
+            const code = this.editor.getValue();
+            const mongo_uri = document.querySelector('#mongo_uri').value;
+            const client = await Services.Adapter.getMongoClient(mongo_uri);
+            var db = client.db();
+            eval(`async function main(db){${code}}; main(db);`)
+          } catch (error) {
+            console.error(error)
+          }
+        },
+        toggleFavorites: function () {
+          document.querySelector("#favorites").classList.toggle("is-active");
+        },
+        addFavorites: function () {
+          let favorites = this.favorites;
+          const mongo_uri = document.querySelector('#mongo_uri').value;
+          favorites.push(mongo_uri);
+          Services.store.set('favorites', favorites);
+          this.updateFavoritesView();
+        },
+        getFavorites: function () {
+          this.favorites = Services.store.get('favorites');
+          return this.favorites;
+        },
+        updateFavoritesView: function () {
+          const favorites = this.getFavorites();
+          const dropdown = document.querySelector('#dropdown-favorites')
+          dropdown.innerHTML = favorites.map(f => ` <a class="dropdown-item">${f}</a>`).join('')
+        }
+      },
+      mounted() {
+        this.updateFavoritesView();
+        var editor = ace.edit('javascript-editor');
+        editor.getSession().setMode('ace/mode/javascript');
+        editor.setTheme('ace/theme/monokai');
+        this.editor = editor;
       }
-    }
-
-    function toggleFavorites() {
-      document.querySelector("#favorites").classList.toggle("is-active");
-    }
-
-    function addFavorites() {
-      let favorites = Service.store.get('favorites');
-      if (!favorites) favorites = [];
-      const mongo_uri = document.querySelector('#mongo_uri').value;
-      favorites.push(mongo_uri);
-      Service.store.set('favorites', favorites);
-      updateFavoritesView();
-    }
-
-    function getFavorites() {
-      return Service.store.get('favorites');;
-    }
-
-    function updateFavoritesView(){
-      const favorites =  getFavorites();
-      const dropdown = document.querySelector('#dropdown-favorites')
-      dropdown.innerHTML = favorites.map(f=>` <a class="dropdown-item">${f}</a>`).join('')
-    }
-
-    updateFavoritesView();
-
+    })
   </script>
 </body>
 
