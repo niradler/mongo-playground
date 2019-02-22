@@ -29,17 +29,17 @@
 
 <body>
   <div id="app">
-    <button onclick="runCode()" class="button" id="run">Run</button>
+    <button  v-on:click="runCode" class="button" id="run">Run</button>
     <div class="container">
       <div class="columns">
         <div class="column is-9">
           <input type="text" class="input" id="mongo_uri" value="mongodb://localhost/test">
         </div>
         <div class="column is-1">
-          <button class="button" onclick="addFavorites()">Add</button>
+          <button class="button" v-on:click="addFavorites">Add</button>
         </div>
         <div class="column">
-          <div id="favorites" v-on:click="toggleFavorites" class="dropdown ">
+          <div id="favorites" v-on:click="toggleFavorites" v-bind:class="{ dropdown: true, is-active: dropdown }">
             <div class="dropdown-trigger">
               <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
                 <span>Favorites</span>
@@ -72,7 +72,8 @@
     const app = new Vue({
       el: '#app',
       data: {
-        favorites: []
+        favorites: [],
+        dropdown: false
       },
       methods: {
         runCode: async function () {
@@ -87,7 +88,8 @@
           }
         },
         toggleFavorites: function () {
-          document.querySelector("#favorites").classList.toggle("is-active");
+          // document.querySelector("#favorites").classList.toggle("is-active");
+          this.dropdown = !this.dropdown;
         },
         addFavorites: function () {
           let favorites = this.favorites;
