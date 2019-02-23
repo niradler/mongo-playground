@@ -6,40 +6,39 @@
   <title>Mongo Playground</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.css" />
   <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
-  <style>
-    #javascript-editor {
-      height: 705px;
-      width: 900;
-    }
+<style>
+  #javascript-editor {
+    height: 705px;
+    width: 900;
+  }
 
-    #run {
-      position: absolute;
-      right: 21px;
-      bottom: 21px;
-      z-index: 5;
-    }
-    body > div > div.columns {
-      margin-top: 0;
-    }
-    body > div > div.columns > div.column.is-9 {
-      margin-left: 9px;
-    }
-  </style>
+  #run {
+    position: absolute;
+    right: 21px;
+    bottom: 21px;
+    z-index: 5;
+  }
+
+  div.columns {
+    margin-top: 0;
+    margin-bottom: 0 !important;
+  }
+</style>
 </head>
 
 <body>
   <div id="app">
-    <button  v-on:click="runCode" class="button" id="run">Run</button>
+    <button v-on:click="runCode" class="button" id="run">Run</button>
     <div class="container">
       <div class="columns">
         <div class="column is-9">
-          <input type="text" class="input" id="mongo_uri" value="mongodb://localhost/test">
+          <input type="text" class="input" id="mongo_uri" v-model="mongo_uri">
         </div>
         <div class="column is-1">
           <button class="button" v-on:click="addFavorites">Add</button>
         </div>
         <div class="column">
-          <div id="favorites" v-on:click="toggleFavorites" v-bind:class="{ dropdown: true, is-active: dropdown }">
+          <div id="favorites" v-on:click="toggleFavorites" class="dropdown is-right" v-bind:class="dropdown">
             <div class="dropdown-trigger">
               <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
                 <span>Favorites</span>
@@ -50,6 +49,8 @@
             </div>
             <div class="dropdown-menu" role="menu">
               <div class="dropdown-content" id="dropdown-favorites">
+                <a class="dropdown-item" v-for="favorite in favorites" v-bind:key="favorite"><span v-on:click="deleteFavorites(favorite)"><i
+                      class="fas fa-trash"></i></span> <span v-on:click="setFavorite(favorite)">{{favorite}}</span></a>
               </div>
             </div>
           </div>
@@ -72,50 +73,50 @@
     const app = new Vue({
       el: '#app',
       data: {
+        mongo_uri: "mongodb://localhost/test",
         favorites: [],
-        dropdown: false
+        dropdown: {
+          'is-active': false
+        }
       },
       methods: {
-        runCode: async function () {
-          try {
-            const code = this.editor.getValue();
-            const mongo_uri = document.querySelector('#mongo_uri').value;
-            const client = await Services.Adapter.getMongoClient(mongo_uri);
+        runCode: function () {
+          const code = this.editor.getValue();
+          Services.Adapter.getMongoClient(this.mongo_uri).then(client => {
             var db = client.db();
             eval(`async function main(db){${code}}; main(db);`)
-          } catch (error) {
+          }).catch(error => {
             console.error(error)
-          }
+          });
         },
         toggleFavorites: function () {
-          // document.querySelector("#favorites").classList.toggle("is-active");
-          this.dropdown = !this.dropdown;
+          this.dropdown['is-active'] = !this.dropdown['is-active'];
         },
         addFavorites: function () {
-          let favorites = this.favorites;
-          const mongo_uri = document.querySelector('#mongo_uri').value;
-          favorites.push(mongo_uri);
-          Services.store.set('favorites', favorites);
-          this.updateFavoritesView();
+          this.favorites.push(this.mongo_uri);
+          Services.store.set('favorites', this.favorites);
+          this.getFavorites();
         },
         getFavorites: function () {
           this.favorites = Services.store.get('favorites');
           return this.favorites;
         },
-        updateFavoritesView: function () {
-          const favorites = this.getFavorites();
-          const dropdown = document.querySelector('#dropdown-favorites')
-          dropdown.innerHTML = favorites.map(f => ` <a class="dropdown-item">${f}</a>`).join('')
+        deleteFavorites: function (favorite) {
+          this.favorites = this.favorites.filter(f => f !== favorite);
+          Services.store.set('favorites', this.favorites);
+        },
+        setFavorite: function (favorite) {
+          this.mongo_uri = favorite;
         }
       },
       mounted() {
-        this.updateFavoritesView();
+        this.getFavorites();
         var editor = ace.edit('javascript-editor');
         editor.getSession().setMode('ace/mode/javascript');
         editor.setTheme('ace/theme/monokai');
         this.editor = editor;
       }
-    })
+    });
   </script>
 </body>
 
