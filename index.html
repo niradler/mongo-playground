@@ -6,15 +6,22 @@
   <title>Mongo Playground</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.css" />
   <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
-<style>
-  #javascript-editor {
+  <style>
+    #javascript-editor {
     height: 705px;
     width: 900;
   }
 
-  #run {
+  #save {
     position: absolute;
     right: 21px;
+    bottom: 21px;
+    z-index: 5;
+  }
+
+  #run {
+    position: absolute;
+    right: 85px;
     bottom: 21px;
     z-index: 5;
   }
@@ -29,15 +36,17 @@
 <body>
   <div id="app">
     <button v-on:click="runCode" class="button" id="run">Run</button>
+    <button v-on:click="addSnippet" class="button" id="save">Save</button>
+
     <div class="container">
       <div class="columns">
-        <div class="column is-9">
+        <div class="column is-7">
           <input type="text" class="input" id="mongo_uri" v-model="mongo_uri">
         </div>
         <div class="column is-1">
           <button class="button" v-on:click="addFavorites">Add</button>
         </div>
-        <div class="column">
+        <div class="column is-2">
           <div id="favorites" v-on:click="toggleFavorites" class="dropdown is-right" v-bind:class="dropdown">
             <div class="dropdown-trigger">
               <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
@@ -49,8 +58,27 @@
             </div>
             <div class="dropdown-menu" role="menu">
               <div class="dropdown-content" id="dropdown-favorites">
-                <a class="dropdown-item" v-for="favorite in favorites" v-bind:key="favorite"><span v-on:click="deleteFavorites(favorite)"><i
-                      class="fas fa-trash"></i></span> <span v-on:click="setFavorite(favorite)">{{favorite}}</span></a>
+                <div class="dropdown-item" v-for="favorite in favorites" v-bind:key="favorite"> <a v-on:click="setFavorite(favorite)">{{favorite}}</a> 
+                  <span v-on:click="deleteFavorites(favorite)"><i class="fas fa-trash"></i></span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="column is-2">
+          <div id="restore" v-on:click="toggleRestore" class="dropdown is-right" v-bind:class="dropdownRestore">
+            <div class="dropdown-trigger">
+              <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                <span>Snippets</span>
+                <span class="icon is-small">
+                  <i class="fas fa-angle-down" aria-hidden="true"></i>
+                </span>
+              </button>
+            </div>
+            <div class="dropdown-menu" role="menu">
+              <div class="dropdown-content" id="dropdown-favorites">
+                <div class="dropdown-item" v-for="snippet in snippets" v-bind:key="snippet"> <a v-on:click="setSnippet(snippet.title)">{{snippet.title}}</a> 
+                  <span  v-on:click="deleteSnippet(snippet.title)"><i class="fas fa-trash"></i></span></div>
               </div>
             </div>
           </div>
@@ -69,13 +97,18 @@
     require('brace/mode/javascript');
     require('brace/theme/monokai');
     const Services = require("./renderer.js");
+    const prompt = require('electron-prompt');
 
     const app = new Vue({
       el: '#app',
       data: {
         mongo_uri: "mongodb://localhost/test",
         favorites: [],
+        snippets: [],
         dropdown: {
+          'is-active': false
+        },
+        dropdownRestore: {
           'is-active': false
         }
       },
@@ -89,6 +122,9 @@
             console.error(error)
           });
         },
+        toggleRestore: function () {
+          this.dropdownRestore['is-active'] = !this.dropdownRestore['is-active'];
+        },
         toggleFavorites: function () {
           this.dropdown['is-active'] = !this.dropdown['is-active'];
         },
@@ -98,7 +134,7 @@
           this.getFavorites();
         },
         getFavorites: function () {
-          this.favorites = Services.store.get('favorites');
+          this.favorites = Services.store.get('favorites') || [];
           return this.favorites;
         },
         deleteFavorites: function (favorite) {
@@ -107,14 +143,55 @@
         },
         setFavorite: function (favorite) {
           this.mongo_uri = favorite;
+        },
+        addSnippet: function () {
+          const code = this.editor.getValue();
+          prompt({
+              title: 'Snippet Title',
+              label: 'Title:',
+              value: 'example 1',
+              inputAttrs: {
+                type: 'text'
+              }
+            })
+            .then((title) => {
+              if (title === null) {
+                console.log('user cancelled');
+              } else {
+                this.snippets.push({
+                  title,
+                  code
+                });
+                Services.store.set('snippets', this.snippets);
+              }
+            })
+            .catch(console.error);
+
+        },
+        getSnippet: function (favorite) {
+          this.snippets = Services.store.get('snippets') || [];
+          return this.snippets;
+        },
+        deleteSnippet: function (title) {
+          this.snippets = this.snippets.filter(s => s.title !== title);
+          Services.store.set('snippets', this.snippets);
+        },
+        setSnippet: function (title) {
+          const snippet = this.snippets.filter(s => s.title === title);
+          this.editor.setValue(snippet[0].code);
+          this.editor.clearSelection();
+        },
+        init: function () {
+          this.getFavorites();
+          this.getSnippet();
+          var editor = ace.edit('javascript-editor');
+          editor.getSession().setMode('ace/mode/javascript');
+          editor.setTheme('ace/theme/monokai');
+          this.editor = editor;
         }
       },
       mounted() {
-        this.getFavorites();
-        var editor = ace.edit('javascript-editor');
-        editor.getSession().setMode('ace/mode/javascript');
-        editor.setTheme('ace/theme/monokai');
-        this.editor = editor;
+        this.init();
       }
     });
   </script>
