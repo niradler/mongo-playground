@@ -1,7 +1,7 @@
 {
   "name": "mongo-playground",
   "version": "1.0.0",
-  "description": "micro-swagger",
+  "description": "mongo-playground simple way to test mongo queries.",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
