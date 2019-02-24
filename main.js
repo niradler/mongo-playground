@@ -101,7 +101,7 @@ const template = [
     submenu: [
       {
         label: 'Learn More',
-        click () { require('electron').shell.openExternal('https://electronjs.org') }
+        click () { require('electron').shell.openExternal('https://github.com/niradler/mongo-playground') }
       }
     ]
   }
@@ -122,18 +122,6 @@ if (process.platform === 'darwin') {
       { role: 'quit' }
     ]
   })
-
-  // Edit menu
-  template[1].submenu.push(
-    { type: 'separator' },
-    {
-      label: 'Speech',
-      submenu: [
-        { role: 'startspeaking' },
-        { role: 'stopspeaking' }
-      ]
-    }
-  )
 
   // Window menu
   template[3].submenu = [
