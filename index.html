@@ -86,8 +86,8 @@
                     v-for="favorite in favorites"
                     v-bind:key="favorite"
                   >
-                    <a v-on:click="setFavorite(favorite)">{{ favorite }}</a>
-                    <span v-on:click="deleteFavorites(favorite)"
+                    <a v-on:click="setFavorite(favorite.id)">{{ favorite.name }}</a>
+                    <span v-on:click="deleteFavorites(favorite.id)"
                       ><i class="fas fa-trash"></i
                     ></span>
                   </div>
@@ -184,20 +184,40 @@
             this.dropdown["is-active"] = !this.dropdown["is-active"];
           },
           addFavorites: function() {
-            this.favorites.push(this.mongo_uri);
-            Services.store.set("favorites", this.favorites);
-            this.getFavorites();
+            prompt({
+              title: "Add to Favorites",
+              label: "Name:",
+              value: "localhost",
+              inputAttrs: {
+                type: "text"
+              }
+            })
+              .then(name => {
+                if (name === null) {
+                  console.log("user cancelled");
+                } else {
+                  this.favorites.push({
+                    name,
+                    uri:this.mongo_uri,
+                    id: randomstring.generate(5)
+                  });
+                  Services.store.set("favorites", this.favorites);
+                  this.getFavorites();
+                }
+              })
+              .catch(console.error);
           },
           getFavorites: function() {
             this.favorites = Services.store.get("favorites") || [];
             return this.favorites;
           },
-          deleteFavorites: function(favorite) {
-            this.favorites = this.favorites.filter(f => f !== favorite);
+          deleteFavorites: function(id) {
+            this.favorites = this.favorites.filter(f => f !== id);
             Services.store.set("favorites", this.favorites);
           },
-          setFavorite: function(favorite) {
-            this.mongo_uri = favorite;
+          setFavorite: function(id) {
+            const favorites = this.favorites.filter(f => f.id === id);
+            this.mongo_uri = favorites[0].uri;
           },
           addSnippet: function() {
             const code = this.editor.getValue();
