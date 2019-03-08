@@ -135,10 +135,8 @@
           </div>
         </div>
 
-        <div id="javascript-editor">
-          const tags = await db.collection('tags').find({}).limit(1).toArray();
-          console.log(tags)
-        </div>
+        <div id="javascript-editor"></div>
+
       </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
@@ -166,6 +164,7 @@
         methods: {
           runCode: function() {
             const code = this.editor.getValue();
+            this.editor.setValue(Services.codeFormatter(code));
             Services.Adapter.getMongoClient(this.mongo_uri)
               .then(client => {
                 var db = client.db();
@@ -262,6 +261,7 @@
             var editor = ace.edit("javascript-editor");
             editor.getSession().setMode("ace/mode/javascript");
             editor.setTheme("ace/theme/monokai");
+            editor.setValue(Services.codeFormatter(`const tags = await db.collection('tags').find({}).limit(1).toArray();console.log(tags);`));            
             this.editor = editor;
           }
         },
