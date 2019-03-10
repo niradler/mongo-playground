@@ -2,8 +2,8 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>Mongo Playground</title>
     <link
       rel="stylesheet"
@@ -86,7 +86,9 @@
                     v-for="favorite in favorites"
                     v-bind:key="favorite"
                   >
-                    <a v-on:click="setFavorite(favorite.id)">{{ favorite.name }}</a>
+                    <a v-on:click="setFavorite(favorite.id)">{{
+                      favorite.name
+                    }}</a>
                     <span v-on:click="deleteFavorites(favorite.id)"
                       ><i class="fas fa-trash"></i
                     ></span>
@@ -136,7 +138,6 @@
         </div>
 
         <div id="javascript-editor"></div>
-
       </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
@@ -164,7 +165,6 @@
         methods: {
           runCode: function() {
             const code = this.editor.getValue();
-            this.editor.setValue(Services.codeFormatter(code));
             Services.Adapter.getMongoClient(this.mongo_uri)
               .then(client => {
                 var db = client.db();
@@ -173,6 +173,7 @@
               .catch(error => {
                 console.error(error);
               });
+            this.editor.setValue(Services.codeFormatter(code));
           },
           toggleRestore: function() {
             this.dropdownRestore["is-active"] = !this.dropdownRestore[
@@ -197,7 +198,7 @@
                 } else {
                   this.favorites.push({
                     name,
-                    uri:this.mongo_uri,
+                    uri: this.mongo_uri,
                     id: randomstring.generate(5)
                   });
                   Services.store.set("favorites", this.favorites);
@@ -261,7 +262,12 @@
             var editor = ace.edit("javascript-editor");
             editor.getSession().setMode("ace/mode/javascript");
             editor.setTheme("ace/theme/monokai");
-            editor.setValue(Services.codeFormatter(`const tags = await db.collection('tags').find({}).limit(1).toArray();console.log(tags);`));            
+            editor.setValue(
+              Services.codeFormatter(
+                `const tags = await db.collection('tags').find({}).limit(1).toArray();console.log(tags);`
+              )
+            );
+            editor.$blockScrolling = Infinity;
             this.editor = editor;
           }
         },
