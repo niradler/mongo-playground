@@ -32,8 +32,6 @@ class Editor extends Component {
   };
 
   onLoad = editor => {
-    if (editor) {
-    }
     this.setState({ loaded: true });
   };
 
@@ -54,8 +52,6 @@ class Editor extends Component {
             editor.codeFormatter(JSON.stringify(this.props.log))
           ]}
           name="ace-editor"
-          enableBasicAutocompletion={true}
-          enableLiveAutocompletion={true}
           setOptions={{ useWorker: false }}
           editorProps={{ $blockScrolling: true }}
           showPrintMargin={false}
