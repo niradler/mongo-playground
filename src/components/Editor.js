@@ -16,9 +16,18 @@ class Editor extends Component {
   };
 
   componentDidMount() {
+    this.setEditorSize();
+
+    window.addEventListener("resize", e => {
+      electron.reload();
+    });
+  }
+
+  setEditorSize = () => {
     const dimensions = electron.getScreenSize();
     this.setState({ dimensions });
-  }
+  };
+
   onChange = (...args) => {
     const code = args[0][0];
     this.props.changeCode(code);

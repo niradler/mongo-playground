@@ -1,5 +1,6 @@
 import React from "react";
 import { Layout, Menu, Input, Tooltip, Icon } from "antd";
+import "./Layout.css";
 
 const { Header, Content } = Layout;
 

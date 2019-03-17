@@ -33,6 +33,7 @@ class App extends Component {
   };
   runCode = async () => {
     try {
+      this.setState({ log: [] });
       const { code } = this.state;
       const client = await DB.getMongoClient(this.state.mongo_uri);
       var db = client.db();
@@ -40,7 +41,7 @@ class App extends Component {
       const run = eval(`async function main(db){${code}}; main(db,log);`);
       await run;
     } catch (e) {
-      console.log(e);
+      this.log(e.message);
     }
   };
 
