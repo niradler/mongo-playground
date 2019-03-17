@@ -1,6 +1,6 @@
-# mongo playground
+# Mongo Playground
 
-mongo-playground simple way to test mongo queries.
+Simple way to test mongo queries, and save them for later use.
 
 [Releases](https://tinyurl.com/y5cac5fm)
 
