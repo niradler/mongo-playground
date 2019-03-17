@@ -5,9 +5,12 @@ const { getCurrentWindow, globalShortcut } = require("electron").remote;
 const store = new Store();
 
 const getScreenSize = () => {
+  const dimensions = {};
   const screenElectron = electron.screen;
   const mainScreen = screenElectron.getPrimaryDisplay();
-  const dimensions = mainScreen.size;
+  dimensions.actual = mainScreen.size;
+  dimensions.bounds = getCurrentWindow().getBounds();
+  dimensions.size = getCurrentWindow().getSize();
 
   return dimensions;
 };

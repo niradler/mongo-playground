@@ -9,23 +9,21 @@ import "brace/theme/monokai";
 
 class Editor extends Component {
   state = {
+    loaded: false,
     dimensions: {
       width: "900",
       height: "680"
     }
   };
 
-  componentDidMount() {
+  componentWillMount() {
     this.setEditorSize();
-
-    window.addEventListener("resize", e => {
-      electron.reload();
-    });
   }
 
   setEditorSize = () => {
     const dimensions = electron.getScreenSize();
-    this.setState({ dimensions });
+    dimensions.bounds.height -= 123;
+    this.setState({ dimensions: dimensions.bounds });
   };
 
   onChange = (...args) => {
@@ -33,16 +31,20 @@ class Editor extends Component {
     this.props.changeCode(code);
   };
 
-  render() {
-    const { dimensions } = this.state;
+  onLoad = editor => {
+    if (editor) {
+    }
+    this.setState({ loaded: true });
+  };
 
+  render() {
     return (
       <div className="Editor">
         <SplitEditor
-          style={{
-            width: dimensions.width,
-            height: "950px"
-          }}
+          onLoad={this.onLoad}
+          height={this.state.dimensions.height + "px"}
+          width={"auto"}
+          ref={editor => (this.editor = editor)}
           mode="javascript"
           theme="monokai"
           splits={2}
@@ -52,7 +54,9 @@ class Editor extends Component {
             editor.codeFormatter(JSON.stringify(this.props.log))
           ]}
           name="ace-editor"
+          enableLiveAutocompletion={true}
           editorProps={{ $blockScrolling: true }}
+          showPrintMargin={false}
           onChange={this.onChange}
         />
       </div>
