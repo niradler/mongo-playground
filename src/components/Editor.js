@@ -54,7 +54,9 @@ class Editor extends Component {
             editor.codeFormatter(JSON.stringify(this.props.log))
           ]}
           name="ace-editor"
+          enableBasicAutocompletion={true}
           enableLiveAutocompletion={true}
+          setOptions={{ useWorker: false }}
           editorProps={{ $blockScrolling: true }}
           showPrintMargin={false}
           onChange={this.onChange}

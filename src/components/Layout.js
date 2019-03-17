@@ -11,6 +11,7 @@ function MainLayout({
   openFavoritesDrawer,
   openSnippetsDrawer,
   codeBeautify,
+  running,
   ...state
 }) {
   return (
@@ -65,8 +66,8 @@ function MainLayout({
             <Menu.Item key="3">
               <Tooltip title="Run code.">
                 <Icon
-                  type="caret-right"
-                  theme="filled"
+                  type={running ? "loading" : "caret-right"}
+                  theme={running ? "" : "filled"}
                   style={{ fontSize: "25px" }}
                   onClick={runCode}
                 />

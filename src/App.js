@@ -23,7 +23,8 @@ class App extends Component {
     name: "",
     currentOp: "",
     code: `const tags = await db.collection('bestCollection').find({}).limit(1).toArray();log(tags);`,
-    showEditor: true
+    showEditor: true,
+    running: false
   };
 
   componentDidMount() {
@@ -50,14 +51,17 @@ class App extends Component {
   };
   runCode = async () => {
     try {
-      this.setState({ log: [] });
+      if (this.state.running) return;
+      this.setState({ log: [], running: true });
       const { code } = this.state;
       const client = await DB.getMongoClient(this.state.mongo_uri);
       var db = client.db();
       var log = this.log;
       const run = eval(`async function main(db){${code}}; main(db,log);`);
       await run;
+      this.setState({ running: false });
     } catch (e) {
+      this.setState({ running: false });
       this.log(e.message);
     }
   };
