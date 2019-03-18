@@ -21,13 +21,14 @@
   },
   "scripts": {
     "start": "rescripts start",
-    "build": "rescripts build",
+    "build": "node --max-old-space-size=8152 --trace-warnings node_modules/react-scripts/bin/react-scripts.js build",
     "test": "rescripts test",
     "eject": "react-scripts eject",
     "dev": "concurrently \"yarn start\" \"wait-on http://localhost:3080 && electron .\"",
-    "postinstall": "electron-builder install-app-deps",
-    "preelectron-pack": "yarn build",
-    "electron-pack": "build -w"
+    "postinstall": "install-app-deps",
+    "electron-pack": "build -- --em.main=build/electron.js",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -56,6 +57,9 @@
     "appId": "com.niradler.mongo-playground",
     "productName": "MongoPlayground",
     "copyright": "Copyright © 2019 ${author}",
+    "win": {
+      "target": "NSIS"
+    },
     "mac": {
       "category": "public.app-category.utilities"
     },
