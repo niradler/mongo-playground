@@ -12,6 +12,5 @@ const getMongoClient = async url => {
   }
   return clients[url];
 };
-module.exports = {
-  getMongoClient
-};
+
+export default { getMongoClient };
