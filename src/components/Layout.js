@@ -10,6 +10,7 @@ function MainLayout({
   runCode,
   openFavoritesDrawer,
   openSnippetsDrawer,
+  toggleQueryBuilderModal,
   codeBeautify,
   running,
   ...state
@@ -33,7 +34,17 @@ function MainLayout({
 
         <div>
           <Menu theme="dark" mode="horizontal" style={{ lineHeight: "75px" }}>
-            <Menu.Item key="0">
+            <Menu.Item key="m1">
+              <Tooltip title="Query Builder.">
+                <Icon
+                  type="edit"
+                  theme="filled"
+                  style={{ fontSize: "25px" }}
+                  onClick={toggleQueryBuilderModal}
+                />
+              </Tooltip>
+            </Menu.Item>
+            <Menu.Item key="m2">
               <Tooltip title="Code beautify.">
                 <Icon
                   type="highlight"
@@ -43,7 +54,7 @@ function MainLayout({
                 />
               </Tooltip>
             </Menu.Item>
-            <Menu.Item key="1">
+            <Menu.Item key="m3">
               <Tooltip title="Add URI to favorite.">
                 <Icon
                   type="plus-circle"
@@ -53,7 +64,7 @@ function MainLayout({
                 />
               </Tooltip>
             </Menu.Item>
-            <Menu.Item key="2">
+            <Menu.Item key="m4">
               <Tooltip title="Save snippet.">
                 <Icon
                   type="snippets"
@@ -63,7 +74,7 @@ function MainLayout({
                 />
               </Tooltip>
             </Menu.Item>
-            <Menu.Item key="3">
+            <Menu.Item key="m5">
               <Tooltip title="Run code.">
                 <Icon
                   type={running ? "loading" : "caret-right"}

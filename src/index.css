@@ -1,3 +1,7 @@
 body {
   background-color: #272822;
 }
+
+.has-error {
+  border-color: red !important;
+}

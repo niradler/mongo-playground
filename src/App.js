@@ -8,6 +8,7 @@ import randomstring from "randomstring";
 import FavoritesDrawer from "./components/FavoritesDrawer";
 import SnippetsDrawer from "./components/SnippetsDrawer";
 import NameModal from "./components/NameModal";
+import QueryBuilderModal from "./components/QueryBuilderModal";
 import { Icon } from "antd";
 import "./App.css";
 
@@ -24,7 +25,11 @@ class App extends Component {
     currentOp: "",
     code: `const tags = await db.collection('bestCollection').find({}).limit(1).toArray();log(tags);`,
     showEditor: true,
-    running: false
+    running: false,
+    queryBuilderModal: false,
+    collections: [],
+    connection: false,
+    tested_uri: null
   };
 
   componentDidMount() {
@@ -49,6 +54,27 @@ class App extends Component {
       log: [newLine, ...this.state.log]
     });
   };
+
+  getCollections = async () => {
+    try {
+      const client = await DB.getMongoClient(this.state.mongo_uri);
+      const db = client.db();
+      const collections = await db.listCollections().toArray();
+
+      this.setState({
+        collections: collections.map(c => c.name),
+        connection: true,
+        tested_uri: this.state.mongo_uri
+      });
+
+      return collections;
+    } catch (error) {
+      this.setState({ collections: [], connection: false, tested_uri: null });
+      console.log(error);
+      return false;
+    }
+  };
+
   runCode = async () => {
     try {
       if (this.state.running) return;
@@ -59,7 +85,7 @@ class App extends Component {
       var log = this.log;
       const run = eval(`async function main(db){${code}}; main(db,log);`);
       await run;
-      this.setState({ running: false });
+      this.setState({ running: false, connection: true });
     } catch (e) {
       this.setState({ running: false });
       this.log(e.message);
@@ -182,10 +208,37 @@ class App extends Component {
   setName = e => {
     this.setState({ name: e.target.value });
   };
+
+  toggleQueryBuilderModal = async () => {
+    try {
+      let { tested_uri, collections, mongo_uri } = this.state;
+      if (!(tested_uri === mongo_uri && collections.length > 0)) {
+        await this.getCollections();
+      }
+      if (this.state.connection) {
+        this.setState({ queryBuilderModal: !this.state.queryBuilderModal });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   render() {
     return (
       <div className="App">
+        <QueryBuilderModal
+          key="QueryBuilderModal"
+          visible={this.state.queryBuilderModal}
+          close={this.toggleQueryBuilderModal}
+          collections={this.state.collections}
+          setCode={code => {
+            this.setState({ code });
+            this.codeBeautify();
+          }}
+          code={this.state.code}
+        />
         <NameModal
+          key="NameModal"
           visible={this.state.nameModal}
           close={this.closeNameModal}
           setName={this.setName}
@@ -193,6 +246,7 @@ class App extends Component {
           name={this.state.name}
         />
         <SnippetsDrawer
+          key="SnippetsDrawer"
           snippets={this.state.snippets}
           close={() => this.setState({ snippetsDrawer: false })}
           visible={this.state.snippetsDrawer}
@@ -201,6 +255,7 @@ class App extends Component {
           addSnippet={() => this.addProcess("snippet")}
         />
         <FavoritesDrawer
+          key="FavoritesDrawer"
           favorites={this.state.favorites}
           mongo_uri={this.state.mongo_uri}
           changeMongoUri={this.changeMongoUri}
@@ -211,6 +266,7 @@ class App extends Component {
           addFavorite={() => this.addProcess("favorite")}
         />
         <Layout
+          key="Layout"
           {...this.state}
           runCode={this.runCode}
           changeMongoUri={this.changeMongoUri}
@@ -218,6 +274,7 @@ class App extends Component {
           openFavoritesDrawer={this.openFavoritesDrawer}
           openSnippetsDrawer={this.openSnippetsDrawer}
           codeBeautify={this.codeBeautify}
+          toggleQueryBuilderModal={this.toggleQueryBuilderModal}
         >
           {this.state.showEditor ? (
             <Editor />
