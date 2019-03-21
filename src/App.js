@@ -51,7 +51,7 @@ class App extends Component {
   log = newLine => {
     console.log(newLine);
     this.setState({
-      log: [newLine, ...this.state.log]
+      log: [...this.state.log, newLine]
     });
   };
 
@@ -232,8 +232,7 @@ class App extends Component {
           close={this.toggleQueryBuilderModal}
           collections={this.state.collections}
           setCode={code => {
-            this.setState({ code });
-            this.codeBeautify();
+            this.setState({ code }, () => this.codeBeautify());
           }}
           code={this.state.code}
         />
@@ -277,7 +276,11 @@ class App extends Component {
           toggleQueryBuilderModal={this.toggleQueryBuilderModal}
         >
           {this.state.showEditor ? (
-            <Editor />
+            <Editor
+              code={this.state.code}
+              changeCode={this.changeCode}
+              log={this.state.log}
+            />
           ) : (
             <div
               style={{

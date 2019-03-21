@@ -12,8 +12,7 @@ function MainLayout({
   openSnippetsDrawer,
   toggleQueryBuilderModal,
   codeBeautify,
-  running,
-  ...state
+  running
 }) {
   return (
     <Layout className="Layout">
@@ -87,7 +86,7 @@ function MainLayout({
           </Menu>
         </div>
       </Header>
-      <Content>{React.cloneElement(children, state)}</Content>
+      <Content>{children}</Content>
     </Layout>
   );
 }

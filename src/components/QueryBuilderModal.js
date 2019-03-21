@@ -7,10 +7,15 @@ const generateMongoCode = query => {
   return `
   const ${query.collection} = await db.collection('${query.collection}').${
     query.action
-  }(${query.filter || "{}"})${query.limit ? `.limit(${query.limit}` : ""}${
-    query.skip ? `.limit(${query.skip}` : ""
-  }${!query.action.includes("One") ? `.toArray()` : ""})
-  ;log(${query.collection});
+  }(${JSON.stringify(query.filter, undefined, 2) || "{}"})
+  ${
+    !query.action.includes("One")
+      ? `${query.limit ? `.limit(${query.limit})` : ""}${
+          query.skip ? `.skip(${query.skip})` : ""
+        }.toArray()`
+      : ""
+  }
+  log(${query.collection});
   `;
 };
 
@@ -23,7 +28,7 @@ const actions = [
   "deleteMany"
 ];
 
-function Pick({ options, setOptions }) {
+function Pick({ placeholder, options, setOptions }) {
   const [dataSource, setDataSource] = React.useState([]);
 
   const onSelect = value => {
@@ -43,7 +48,7 @@ function Pick({ options, setOptions }) {
       style={{ width: 200 }}
       onSelect={onSelect}
       onSearch={handleSearch}
-      placeholder="input here"
+      placeholder={placeholder}
     />
   );
 }
@@ -123,10 +128,18 @@ function QueryBuilder(props) {
     >
       <Tabs defaultActiveKey="t1" activeKey={step}>
         <TabPane tab="Pick Collection" key="t1">
-          <Pick options={props.collections} setOptions={setCollection} />
+          <Pick
+            options={props.collections}
+            setOptions={setCollection}
+            placeholder="Pick an Collection"
+          />
         </TabPane>
         <TabPane tab="Pick Action" key="t2" disabled={!query.collection}>
-          <Pick options={actions} setOptions={setAction} />
+          <Pick
+            options={actions}
+            setOptions={setAction}
+            placeholder="Pick an Action"
+          />
         </TabPane>
         <TabPane tab="Set Options" key="t3" disabled={step !== "t3"}>
           <TextArea

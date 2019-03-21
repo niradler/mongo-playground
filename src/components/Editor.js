@@ -39,17 +39,6 @@ class Editor extends Component {
     this.setState({ loaded: true });
   };
 
-  static getDerivedStateFromProps(nextProps, prevState) {
-    if (nextProps.code !== prevState.code) {
-      debugger;
-    } else return null;
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (prevProps.code !== prevState.code) {
-      debugger;
-    }
-  }
   render() {
     return (
       <div className="Editor">
