@@ -17,21 +17,38 @@ function SnippetsDrawer(props) {
         itemLayout="horizontal"
         dataSource={props.snippets}
         renderItem={item => (
-          <List.Item>
-            <Icon type="link" />
-            &nbsp;
-            {item.title}
-            &nbsp; &nbsp;
-            <Icon
-              type="delete"
-              theme="filled"
-              onClick={() => props.deleteSnippet(item.id)}
-            />
-            <Icon
-              type="check-circle"
-              theme="filled"
-              onClick={() => props.applySnippet(item.code)}
-            />
+          <List.Item
+            style={{
+              display: "flex",
+              justifyContent: "space-between"
+            }}
+          >
+            <span
+              style={{
+                maxWidth: "147px"
+              }}
+            >
+              <Icon type="link" />
+              &nbsp;
+              {item.title}
+              &nbsp;
+            </span>
+            <span
+              style={{
+                fontSize: "17px"
+              }}
+            >
+              <Icon
+                type="delete"
+                theme="filled"
+                onClick={() => props.deleteSnippet(item.id)}
+              />
+              <Icon
+                type="check-circle"
+                theme="filled"
+                onClick={() => props.applySnippet(item.code)}
+              />
+            </span>
           </List.Item>
         )}
       />

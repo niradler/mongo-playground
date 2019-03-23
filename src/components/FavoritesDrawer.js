@@ -1,5 +1,5 @@
 import React from "react";
-import { Drawer, Input, List, Icon } from "antd";
+import { Drawer, Input, List, Icon, Button } from "antd";
 
 function FavoritesDrawer(props) {
   return (
@@ -10,32 +10,52 @@ function FavoritesDrawer(props) {
       onClose={props.close}
       visible={props.visible}
     >
-      <Input
-        value={props.mongo_uri}
-        onChange={props.changeMongoUri}
-        suffix={
-          <Icon type="plus-square" theme="filled" onClick={props.addFavorite} />
-        }
-      />
+      <Input value={props.mongo_uri} onChange={props.changeMongoUri} />
+      <div
+        style={{
+          paddingTop: "7px"
+        }}
+      >
+        <Button type="primary" onClick={props.addFavorite}>
+          Add Favorite
+        </Button>
+      </div>
       <List
         itemLayout="horizontal"
         dataSource={props.favorites}
         renderItem={item => (
-          <List.Item>
-            <Icon type="link" />
-            &nbsp;
-            {item.name}
-            &nbsp; &nbsp;
-            <Icon
-              type="delete"
-              theme="filled"
-              onClick={() => props.deleteFavorite(item.id)}
-            />
-            <Icon
-              type="check-circle"
-              theme="filled"
-              onClick={() => props.applyFavorite(item.uri)}
-            />
+          <List.Item
+            style={{
+              display: "flex",
+              justifyContent: "space-between"
+            }}
+          >
+            <span
+              style={{
+                maxWidth: "147px"
+              }}
+            >
+              <Icon type="link" />
+              &nbsp;
+              {item.name}
+              &nbsp; &nbsp;
+            </span>
+            <span
+              style={{
+                fontSize: "17px"
+              }}
+            >
+              <Icon
+                type="delete"
+                theme="filled"
+                onClick={() => props.deleteFavorite(item.id)}
+              />
+              <Icon
+                type="check-circle"
+                theme="filled"
+                onClick={() => props.applyFavorite(item.uri)}
+              />
+            </span>
           </List.Item>
         )}
       />

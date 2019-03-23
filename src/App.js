@@ -70,7 +70,7 @@ class App extends Component {
       return collections;
     } catch (error) {
       this.setState({ collections: [], connection: false, tested_uri: null });
-      console.log(error);
+      this.log(error.message);
       return false;
     }
   };
