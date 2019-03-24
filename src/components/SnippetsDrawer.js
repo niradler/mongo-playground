@@ -10,9 +10,19 @@ function SnippetsDrawer(props) {
       onClose={props.close}
       visible={props.visible}
     >
-      <Button type="primary" onClick={props.addSnippet}>
-        Add Snippet
-      </Button>
+      <div>
+        <Button onClick={props.sync}>Sync with Github</Button>
+      </div>
+      <div
+        style={{
+          paddingTop: "7px"
+        }}
+      >
+        <Button type="primary" onClick={props.addSnippet}>
+          Add Snippet
+        </Button>
+      </div>
+
       <List
         itemLayout="horizontal"
         dataSource={props.snippets}
@@ -43,6 +53,7 @@ function SnippetsDrawer(props) {
                 theme="filled"
                 onClick={() => props.deleteSnippet(item.id)}
               />
+              <Icon type="share-alt" onClick={() => props.share(item)} />
               <Icon
                 type="check-circle"
                 theme="filled"

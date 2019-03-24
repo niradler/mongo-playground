@@ -2,14 +2,16 @@ import React, { Component } from "react";
 import Editor from "./components/Editor";
 import Layout from "./components/Layout";
 import DB from "./helpers/db.helper";
+import github from "./helpers/github.helper";
 import editor from "./helpers/editor.helper";
 import electron from "./helpers/electron.helper";
 import randomstring from "randomstring";
 import FavoritesDrawer from "./components/FavoritesDrawer";
 import SnippetsDrawer from "./components/SnippetsDrawer";
 import NameModal from "./components/NameModal";
+import SetGithubTokenModal from "./components/SetGithubTokenModal";
 import QueryBuilderModal from "./components/QueryBuilderModal";
-import { Icon } from "antd";
+import { message, Icon } from "antd";
 import "./App.css";
 
 class App extends Component {
@@ -18,12 +20,13 @@ class App extends Component {
     nameModal: false,
     favoritesDrawer: false,
     snippetsDrawer: false,
+    setGithubTokenModal: false,
     favorites: [],
     snippets: [],
     log: [],
     name: "",
     currentOp: "",
-    code: `const tags = await db.collection('bestCollection').find({}).limit(1).toArray();log(tags);`,
+    code: "",
     showEditor: true,
     running: false,
     queryBuilderModal: false,
@@ -34,24 +37,32 @@ class App extends Component {
 
   componentDidMount() {
     this.init();
-    this.codeBeautify();
-    window.addEventListener("resize", e => {
-      this.setState({ showEditor: false });
-      setTimeout(() => {
-        this.setState({ showEditor: true });
-      }, 100);
-    });
   }
 
-  init = () => {
-    this.getFavorites();
-    this.getSnippets();
+  init = async () => {
+    try {
+      const code = window.localStorage.getItem("code") || "";
+      this.getFavorites();
+      this.getSnippets();
+      this.changeCode(code, () => this.codeBeautify());
+
+      window.addEventListener("resize", e => {
+        this.setState({ showEditor: false });
+        setTimeout(() => {
+          this.setState({ showEditor: true });
+        }, 100);
+      });
+
+      await github.init();
+    } catch (error) {
+      this.log(error.message, true);
+    }
   };
 
-  log = newLine => {
+  log = (newLine, overWrite) => {
     console.log(newLine);
     this.setState({
-      log: [...this.state.log, newLine]
+      log: overWrite ? [newLine] : [...this.state.log, newLine]
     });
   };
 
@@ -70,8 +81,7 @@ class App extends Component {
       return collections;
     } catch (error) {
       this.setState({ collections: [], connection: false, tested_uri: null });
-      this.log(error.message);
-      return false;
+      throw error;
     }
   };
 
@@ -88,7 +98,33 @@ class App extends Component {
       this.setState({ running: false, connection: true });
     } catch (e) {
       this.setState({ running: false });
-      this.log(e.message);
+      this.log(e.message, true);
+    }
+  };
+
+  saveCode = async snippet => {
+    try {
+      const res = await github.edit(snippet);
+
+      return res.body.id;
+    } catch (e) {
+      this.log(e.message, true);
+    }
+  };
+
+  shareCode = async snippet => {
+    try {
+      if (snippet.shareLink) {
+        message.info(snippet.shareLink);
+      } else {
+        const res = await github.create(snippet);
+        const shareLink = "https://gist.github.com/" + res.body.id;
+        message.info(shareLink);
+        snippet.shareLink = shareLink;
+        this.updateSnippet(snippet);
+      }
+    } catch (e) {
+      this.log(e.message, true);
     }
   };
 
@@ -100,12 +136,15 @@ class App extends Component {
       let code = this.state.code;
       code = editor.codeFormatter(code);
       this.changeCode(code);
-    } catch (e) {
-      console.error(e.message);
+    } catch (error) {
+      this.log(error.message, true);
     }
   };
-  changeCode = code => {
-    this.setState({ code });
+  changeCode = (code, fn) => {
+    this.setState({ code }, () => {
+      if (fn) fn(code);
+    });
+    if (code.length > 0) window.localStorage.setItem("code", code);
   };
 
   applyFavorite = async url => {
@@ -131,7 +170,7 @@ class App extends Component {
         this.setState({ favorites });
       }
     } catch (error) {
-      console.log(error);
+      this.log(error.message, true);
     }
   };
 
@@ -146,7 +185,12 @@ class App extends Component {
     const snippets = electron.store.get("snippets") || [];
     this.setState({ snippets });
   };
-
+  updateSnippet = snippet => {
+    let { snippets } = this.state;
+    snippets = snippets.map(s => (s.id === snippet.id ? snippet : s));
+    electron.store.set("snippets", snippets);
+    this.setState({ snippets });
+  };
   deleteSnippet = id => {
     let { snippets } = this.state;
     snippets = snippets.filter(s => s.id !== id);
@@ -168,11 +212,11 @@ class App extends Component {
         this.setState({ snippets });
       }
     } catch (error) {
-      console.log(error);
+      this.log(error.message, true);
     }
   };
   applySnippet = code => {
-    this.setState({ code });
+    this.changeCode(code);
   };
   openSnippetsDrawer = () => {
     this.setState({ snippetsDrawer: !this.state.snippetsDrawer });
@@ -219,20 +263,63 @@ class App extends Component {
         this.setState({ queryBuilderModal: !this.state.queryBuilderModal });
       }
     } catch (error) {
-      console.log(error);
+      this.log(error.message, true);
     }
   };
 
+  setGithubToken = token => {
+    electron.store.set("github_api_key", token);
+  };
+  getGithubToken = () => {
+    return electron.store.get("github_api_key");
+  };
+  toggleSetGithubTokenModal = () => {
+    this.setState({ setGithubTokenModal: !this.state.setGithubTokenModal });
+  };
+  syncWithGithub = async () => {
+    try {
+      const { snippets } = this.state;
+      const files = {};
+      if (snippets.length > 0) {
+        for (let i = 0; i < snippets.length; i++) {
+          const snippet = snippets[i];
+          files[`mp-${snippet.title}.js`] = { content: snippet.code };
+        }
+        await github.sync(files);
+      }
+    } catch (error) {
+      this.log(error.message, true);
+    }
+  };
+  sync = async () => {
+    try {
+      const token = this.getGithubToken();
+      if (token) {
+        await this.syncWithGithub();
+      } else {
+        this.toggleSetGithubTokenModal();
+      }
+    } catch (error) {
+      this.log(error.message, true);
+    }
+  };
   render() {
     return (
       <div className="App">
+        <SetGithubTokenModal
+          key="SetGithubTokenModal"
+          onOk={this.setGithubToken}
+          onCancel={this.toggleSetGithubTokenModal}
+          visible={this.state.setGithubTokenModal}
+          token={this.getGithubToken()}
+        />
         <QueryBuilderModal
           key="QueryBuilderModal"
           visible={this.state.queryBuilderModal}
           close={this.toggleQueryBuilderModal}
           collections={this.state.collections}
           setCode={code => {
-            this.setState({ code }, () => this.codeBeautify());
+            this.changeCode(code, () => this.codeBeautify());
           }}
           code={this.state.code}
         />
@@ -252,6 +339,8 @@ class App extends Component {
           deleteSnippet={this.deleteSnippet}
           applySnippet={this.applySnippet}
           addSnippet={() => this.addProcess("snippet")}
+          sync={this.sync}
+          share={this.shareCode}
         />
         <FavoritesDrawer
           key="FavoritesDrawer"
