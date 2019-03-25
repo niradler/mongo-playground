@@ -54,8 +54,19 @@ class App extends Component {
       });
 
       await github.init();
+      this.regGlobalShortcut();
     } catch (error) {
       this.log(error.message, true);
+    }
+  };
+
+  regGlobalShortcut = () => {
+    const ret = electron.globalShortcut.register("f5", () => {
+      this.runCode();
+    });
+
+    if (!ret) {
+      console.log("registration failed");
     }
   };
 

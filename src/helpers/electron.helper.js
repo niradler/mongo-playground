@@ -1,7 +1,7 @@
 const electron = require("electron");
 const Store = require("electron-store");
 const { getCurrentWindow, globalShortcut } = require("electron").remote;
-const { shell } = require("electron");
+const { shell, app } = require("electron");
 const store = new Store();
 
 const getScreenSize = () => {
@@ -19,4 +19,4 @@ const reload = () => {
   getCurrentWindow().reload();
 };
 
-export default { getScreenSize, store, reload, shell };
+export default { getScreenSize, store, reload, shell, globalShortcut, app };
