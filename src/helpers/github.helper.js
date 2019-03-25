@@ -1,11 +1,12 @@
 import Gists from "gists";
 import electron from "./electron.helper";
-const gists = new Gists({
-  token: electron.store.get("github_api_key")
-});
-
+let gists = null;
 const init = async () => {
   try {
+    const _gists = new Gists({
+      token: electron.store.get("github_api_key")
+    });
+    gists = _gists;
     let gistId = electron.store.get("gistId");
     if (!gistId) {
       const res = await gists.create({

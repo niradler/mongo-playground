@@ -69,7 +69,7 @@
   },
   "scripts": {
     "start": "node scripts/start.js",
-    "build": "node --max-old-space-size=8152 --trace-warnings scripts/build.js",
+    "build": "node --max-old-space-size=8152 --trace-warnings ./scripts/build.js",
     "test": "node scripts/test.js",
     "dev": "concurrently \"npm run start\" \"wait-on http://localhost:3080 && electron .\"",
     "postinstall": "install-app-deps",
