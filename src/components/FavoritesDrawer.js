@@ -4,7 +4,7 @@ import { Drawer, Input, List, Icon, Button } from "antd";
 function FavoritesDrawer(props) {
   return (
     <Drawer
-      title="Favorites Connections URI"
+      title="Connections"
       placement="right"
       closable={true}
       onClose={props.close}

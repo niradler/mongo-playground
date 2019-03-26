@@ -10,15 +10,15 @@ Simple way to test mongo queries, and save them for later use.
 
 ![nav](https://github.com/niradler/mongo-playground/blob/master/assets/nav.PNG)
 
-- export code
-- open query builder
+- Export code
+- Query builder
   ![queryBuilder](https://github.com/niradler/mongo-playground/blob/master/assets/queryBuilder.png)
-- code beautify
-- connections
+- Code beautify
+- Connections
   ![connections](https://github.com/niradler/mongo-playground/blob/master/assets/connections.png)
-- snippets
+- Snippets
   ![snippets](https://github.com/niradler/mongo-playground/blob/master/assets/snippets.png)
-- run (f5)
+- Run (f5)
 
 ## TDOO:
 
