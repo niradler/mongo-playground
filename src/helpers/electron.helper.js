@@ -1,7 +1,11 @@
 const electron = require("electron");
 const Store = require("electron-store");
-const { getCurrentWindow, globalShortcut } = require("electron").remote;
+const { getCurrentWindow, globalShortcut, dialog } = require("electron").remote;
 const { shell, app } = require("electron");
+const fs = require("fs");
+const util = require("util");
+const writeFile = util.promisify(fs.writeFile);
+
 const store = new Store();
 
 const getScreenSize = () => {
@@ -19,4 +23,22 @@ const reload = () => {
   getCurrentWindow().reload();
 };
 
-export default { getScreenSize, store, reload, shell, globalShortcut, app };
+const downloadFile = fileString => {
+  let savePath = dialog.showSaveDialog({
+    filters: [{ name: "JavaScript", extensions: ["js"] }]
+  });
+  if (!savePath) return;
+  if (!savePath.includes(".js")) savePath += ".js";
+
+  return writeFile(savePath, fileString);
+};
+
+export default {
+  getScreenSize,
+  store,
+  reload,
+  shell,
+  globalShortcut,
+  app,
+  downloadFile
+};

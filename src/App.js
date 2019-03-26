@@ -13,7 +13,8 @@ import SetGithubTokenModal from "./components/SetGithubTokenModal";
 import QueryBuilderModal from "./components/QueryBuilderModal";
 import { message, Icon } from "antd";
 import "./App.css";
-
+import { fork } from "child_process";
+const isDebug = process.env.DEBUG;
 class App extends Component {
   state = {
     mongo_uri: "mongodb://localhost/test",
@@ -101,15 +102,40 @@ class App extends Component {
       if (this.state.running) return;
       this.setState({ log: [], running: true });
       const { code } = this.state;
-      const client = await DB.getMongoClient(this.state.mongo_uri);
-      var db = client.db();
-      var log = this.log;
-      const run = eval(`async function main(db){${code}}; main(db,log);`);
-      await run;
-      this.setState({ running: false, connection: true });
+      const forked = fork(
+        require.resolve("./helpers/runner.js"),
+        [isDebug ? "--inspect-brk" : ""],
+        {}
+      );
+      forked.unref();
+      forked.send({ code, uri: this.state.mongo_uri });
+      const statusCode = await new Promise(resolve => {
+        forked.on("message", msg => {
+          this.log(msg.log);
+        });
+        forked.on("exit", function(code) {
+          console.log("exit", code);
+          resolve(code);
+        });
+        forked.on("close", function(code) {
+          resolve(code);
+        });
+      });
+
+      const newState = {
+        running: false,
+        connection: true
+      };
+
+      if (statusCode === 1) {
+        newState.connection = false;
+      }
+
+      this.setState(newState);
     } catch (e) {
+      console.log(e);
       this.setState({ running: false });
-      this.log(e.message, true);
+      this.log(e ? e.message : "runCode error", true);
     }
   };
 
@@ -315,6 +341,27 @@ class App extends Component {
       this.log(error.message, true);
     }
   };
+  export = () => {
+    let exportData = `
+    const MongoClient = require("mongodb").MongoClient;
+    const log = console.log;
+    
+     async function main(){
+       try{
+        const client = await MongoClient.connect("${this.state.mongo_uri}", {
+      useNewUrlParser: true
+    });
+    const db = client.db();
+       ${this.state.code}
+  }catch(error){console.log(error)}
+     }; 
+    main();
+    `;
+    try {
+      exportData = editor.codeFormatter(exportData);
+    } catch (error) {}
+    electron.downloadFile(exportData);
+  };
   render() {
     return (
       <div className="App">
@@ -377,6 +424,7 @@ class App extends Component {
           openSnippetsDrawer={this.openSnippetsDrawer}
           codeBeautify={this.codeBeautify}
           toggleQueryBuilderModal={this.toggleQueryBuilderModal}
+          exportFile={this.export}
         >
           {this.state.showEditor ? (
             <Editor

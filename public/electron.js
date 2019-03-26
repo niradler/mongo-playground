@@ -1,9 +1,9 @@
 const electron = require("electron");
-const { app, Menu } = electron;
-const BrowserWindow = electron.BrowserWindow;
-
 const path = require("path");
 const isDev = require("electron-is-dev");
+
+const { app, Menu } = electron;
+const BrowserWindow = electron.BrowserWindow;
 
 let mainWindow;
 

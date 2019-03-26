@@ -12,6 +12,7 @@ function MainLayout({
   openSnippetsDrawer,
   toggleQueryBuilderModal,
   codeBeautify,
+  exportFile,
   running
 }) {
   return (
@@ -33,6 +34,16 @@ function MainLayout({
 
         <div>
           <Menu theme="dark" mode="horizontal" style={{ lineHeight: "75px" }}>
+            <Menu.Item key="m0">
+              <Tooltip title="Export Code.">
+                <Icon
+                  type="save"
+                  theme="filled"
+                  style={{ fontSize: "25px" }}
+                  onClick={exportFile}
+                />
+              </Tooltip>
+            </Menu.Item>
             <Menu.Item key="m1">
               <Tooltip title="Query Builder.">
                 <Icon
