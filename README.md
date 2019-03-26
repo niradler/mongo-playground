@@ -8,7 +8,17 @@ Simple way to test mongo queries, and save them for later use.
 
 ## Menus
 
-![connections](https://github.com/niradler/mongo-playground/blob/master/assets/connections.png)
+![nav](https://github.com/niradler/mongo-playground/blob/master/assets/nav.png)
+
+- export code
+- open query builder
+  ![queryBuilder](https://github.com/niradler/mongo-playground/blob/master/assets/queryBuilder.png)
+- code beautify
+- connections
+  ![connections](https://github.com/niradler/mongo-playground/blob/master/assets/connections.png)
+- snippets
+  ![snippets](https://github.com/niradler/mongo-playground/blob/master/assets/snippets.png)
+- run (f5)
 
 ## TDOO:
 
