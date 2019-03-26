@@ -201,6 +201,7 @@ class App extends Component {
     snippets = snippets.map(s => (s.id === snippet.id ? snippet : s));
     electron.store.set("snippets", snippets);
     this.setState({ snippets });
+    message.success(snippet.title + " updated!");
   };
   deleteSnippet = id => {
     let { snippets } = this.state;
@@ -350,6 +351,8 @@ class App extends Component {
           deleteSnippet={this.deleteSnippet}
           applySnippet={this.applySnippet}
           addSnippet={() => this.addProcess("snippet")}
+          updateSnippet={this.updateSnippet}
+          code={this.state.code}
           sync={this.sync}
           share={this.shareCode}
         />
