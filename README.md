@@ -8,7 +8,7 @@ Simple way to test mongo queries, and save them for later use.
 
 ## Menus
 
-![nav](https://github.com/niradler/mongo-playground/blob/master/assets/nav.png)
+![nav](https://github.com/niradler/mongo-playground/blob/master/assets/nav.PNG)
 
 - export code
 - open query builder
