@@ -6,7 +6,7 @@ Simple way to test mongo queries, and save them for later use.
 
 ![mongo playground](https://github.com/niradler/mongo-playground/blob/master/assets/demo.gif)
 
-## Menus
+## Menu
 
 ![nav](https://github.com/niradler/mongo-playground/blob/master/assets/nav.PNG)
 
