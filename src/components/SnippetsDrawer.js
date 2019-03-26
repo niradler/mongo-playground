@@ -40,7 +40,7 @@ function SnippetsDrawer(props) {
             >
               <Icon type="link" />
               &nbsp;
-              {item.title}
+              <a onClick={() => props.applySnippet(item.code)}>{item.title}</a>
               &nbsp;
             </span>
             <span
@@ -55,9 +55,11 @@ function SnippetsDrawer(props) {
               />
               <Icon type="share-alt" onClick={() => props.share(item)} />
               <Icon
-                type="check-circle"
+                type="save"
                 theme="filled"
-                onClick={() => props.applySnippet(item.code)}
+                onClick={() =>
+                  props.updateSnippet({ ...item, code: props.code })
+                }
               />
             </span>
           </List.Item>
