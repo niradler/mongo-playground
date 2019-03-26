@@ -35,7 +35,7 @@ function MainLayout({
         <div>
           <Menu theme="dark" mode="horizontal" style={{ lineHeight: "75px" }}>
             <Menu.Item key="m0">
-              <Tooltip title="Export Code.">
+              <Tooltip title="Export">
                 <Icon
                   type="save"
                   theme="filled"
@@ -45,7 +45,7 @@ function MainLayout({
               </Tooltip>
             </Menu.Item>
             <Menu.Item key="m1">
-              <Tooltip title="Query Builder.">
+              <Tooltip title="Query Builder">
                 <Icon
                   type="edit"
                   theme="filled"
@@ -55,7 +55,7 @@ function MainLayout({
               </Tooltip>
             </Menu.Item>
             <Menu.Item key="m2">
-              <Tooltip title="Code beautify.">
+              <Tooltip title="Beautify">
                 <Icon
                   type="highlight"
                   theme="filled"
@@ -65,7 +65,7 @@ function MainLayout({
               </Tooltip>
             </Menu.Item>
             <Menu.Item key="m3">
-              <Tooltip title="Add URI to favorite.">
+              <Tooltip title="Connections">
                 <Icon
                   type="plus-circle"
                   theme="filled"
@@ -75,7 +75,7 @@ function MainLayout({
               </Tooltip>
             </Menu.Item>
             <Menu.Item key="m4">
-              <Tooltip title="Save snippet.">
+              <Tooltip title="Snippets">
                 <Icon
                   type="snippets"
                   theme="filled"
@@ -85,7 +85,7 @@ function MainLayout({
               </Tooltip>
             </Menu.Item>
             <Menu.Item key="m5">
-              <Tooltip title="Run code.">
+              <Tooltip title="Run">
                 <Icon
                   type={running ? "loading" : "caret-right"}
                   theme={running ? "" : "filled"}

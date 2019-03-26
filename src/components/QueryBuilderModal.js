@@ -7,10 +7,14 @@ const generateMongoCode = query => {
   return `
   const ${query.collection} = await db.collection('${query.collection}').${
     query.action
-  }(${JSON.stringify(query.filter, undefined, 2) || "{}"})
+  }(${JSON.stringify(query.filter, undefined, 2) || "{}"}${
+    query.action.includes("update") ? ",{$set:{}}" : ""
+  })
   ${
-    !query.action.includes("One")
-      ? `${query.limit ? `.limit(${query.limit})` : ""}${
+    !query.action.includes("One") && query.action.includes("find")
+      ? `${
+          query.sort ? `.sort(${JSON.stringify(query.sort, undefined, 2)})` : ""
+        }${query.limit ? `.limit(${query.limit})` : ""}${
           query.skip ? `.skip(${query.skip})` : ""
         }.toArray()`
       : ""
