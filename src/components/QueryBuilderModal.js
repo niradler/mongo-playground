@@ -1,4 +1,5 @@
 import React from "react";
+import { AppContext } from "../data/AppContext";
 import { Modal, Tabs, Button, AutoComplete, Input } from "antd";
 const { TextArea } = Input;
 const TabPane = Tabs.TabPane;
@@ -109,7 +110,8 @@ function Pick({ placeholder, options, setOptions }) {
   );
 }
 
-function QueryBuilder(props) {
+function QueryBuilder() {
+  const { state, dispatch } = React.useContext(AppContext);
   const initialOptions = { filter: {}, skip: 0, limit: 1, sort: {} };
   const [query, setQuery] = React.useState({});
   const [step, setStep] = React.useState("t1");
@@ -138,7 +140,7 @@ function QueryBuilder(props) {
     setStep("t1");
     setQuery({});
     setOptions(JSON.stringify(initialOptions, undefined, 2));
-    props.close();
+    dispatch({ type: "queryBuilderModal" });
   };
 
   const setQueryOptions = e => {
@@ -159,14 +161,14 @@ function QueryBuilder(props) {
 
   const generate = () => {
     const code = generateMongoCode({ ...query, ...JSON.parse(options) });
-    props.setCode(props.code + code);
+    dispatch({ type: "code", payload: state.code + code });
     cancel();
   };
 
   return (
     <Modal
       title="QueryBuilder"
-      visible={props.visible}
+      visible={state.queryBuilderModal}
       onCancel={cancel}
       footer={[
         <Button key="Cancel" onClick={cancel}>
@@ -185,7 +187,7 @@ function QueryBuilder(props) {
       <Tabs defaultActiveKey="t1" activeKey={step}>
         <TabPane tab="Pick Collection" key="t1">
           <Pick
-            options={props.collections}
+            options={state.collections}
             setOptions={setCollection}
             placeholder="Pick an Collection"
           />
