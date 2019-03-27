@@ -4,7 +4,7 @@ console.original_log = console.log;
 var _log = [];
 
 var log = data => {
-  process.send({ log: data });
+  process.send({ log: data, pid: process.pid });
 };
 
 function inject(code, db) {
@@ -27,12 +27,12 @@ process.on("message", async task => {
     process.exit();
   } catch (error) {
     console.original_log(error);
-    process.send({ log: error.message });
+    process.send({ log: error.message, error, pid: process.pid });
     process.exit(1);
   }
 });
 
-process.on("uncaughtException", function(e) {
-  console.original_log(e);
-  process.send(process.pid + ": " + e);
+process.on("uncaughtException", function(error) {
+  console.original_log(error);
+  process.send({ pid: process.pid, error });
 });

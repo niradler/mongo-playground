@@ -1,6 +1,9 @@
 const electron = require("electron");
 const path = require("path");
 const isDev = require("electron-is-dev");
+const fixPath = require("fix-path");
+
+fixPath();
 
 const { app, Menu } = electron;
 const BrowserWindow = electron.BrowserWindow;

@@ -102,16 +102,17 @@ class App extends Component {
       if (this.state.running) return;
       this.setState({ log: [], running: true });
       const { code } = this.state;
-      const forked = fork(
-        require.resolve("./helpers/runner.js"),
-        [isDebug ? "--inspect-brk" : ""],
-        {}
-      );
-      forked.unref();
+      let pid = 0;
+      const runner = require.resolve("./helpers/runner.js");
+      const forked = fork(runner, [isDebug ? "--inspect-brk" : ""], {
+        cwd: __dirname
+      });
+      // forked.unref();
       forked.send({ code, uri: this.state.mongo_uri });
       const statusCode = await new Promise(resolve => {
         forked.on("message", msg => {
-          this.log(msg.log);
+          if (msg.log) this.log(msg.log);
+          if (msg.pid) pid = msg.pid;
         });
         forked.on("exit", function(code) {
           console.log("exit", code);
@@ -122,20 +123,18 @@ class App extends Component {
         });
       });
 
-      const newState = {
-        running: false,
-        connection: true
-      };
-
-      if (statusCode === 1) {
-        newState.connection = false;
+      if (statusCode === 0) {
+        this.setState({
+          running: false,
+          connection: true
+        });
+      } else {
+        throw new Error("Failed to run.");
       }
-
-      this.setState(newState);
     } catch (e) {
       console.log(e);
-      this.setState({ running: false });
-      this.log(e ? e.message : "runCode error", true);
+      this.setState({ running: false, connection: false });
+      this.log(e.message, true);
     }
   };
 
