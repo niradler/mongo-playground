@@ -3,9 +3,11 @@ import { Drawer, Input, List, Icon, Button } from "antd";
 import { AppContext } from "../data/AppContext";
 import randomstring from "randomstring";
 import electron from "../helpers/electron.helper";
+import RequestTextModal from "./RequestTextModal";
 
 function ConnectionsDrawer() {
   const { state, dispatch } = React.useContext(AppContext);
+  const [modal, setModal] = React.useState(false);
 
   const close = () => dispatch({ type: "connectionsDrawer" });
 
@@ -15,6 +17,10 @@ function ConnectionsDrawer() {
     dispatch({ type: "connections", payload: connections });
 
   const applyConnection = uri => dispatch({ type: "uri", payload: uri });
+
+  const addConnectionModal = () => {
+    setModal(true);
+  };
 
   const addConnection = async name => {
     try {
@@ -29,6 +35,7 @@ function ConnectionsDrawer() {
         electron.store.set("connections", connections);
         updateConnections(connections);
       }
+      setModal(false);
     } catch (error) {
       this.log(error.message, true);
     }
@@ -40,64 +47,82 @@ function ConnectionsDrawer() {
     electron.store.set("connections", connections);
     updateConnections(connections);
   };
+
+  const updateConnection = id => {
+    let { connections } = state;
+    connections = connections.map(s =>
+      s.id === id ? { ...s, uri: state.uri } : s
+    );
+    electron.store.set("connections", connections);
+    updateConnections(connections);
+  };
+
   return (
-    <Drawer
-      title="Connections"
-      placement="right"
-      closable={true}
-      onClose={close}
-      visible={state.connectionsDrawer}
-    >
-      <Input value={state.uri} onChange={onUriChange} />
-      <div
-        style={{
-          paddingTop: "7px"
-        }}
+    <div>
+      {modal && (
+        <RequestTextModal
+          action={addConnection}
+          close={() => setModal(false)}
+        />
+      )}
+      <Drawer
+        title="Connections"
+        placement="right"
+        closable={true}
+        onClose={close}
+        visible={state.connectionsDrawer}
       >
-        <Button type="primary" onClick={addConnection}>
-          Add Connection
-        </Button>
-      </div>
-      <List
-        itemLayout="horizontal"
-        dataSource={state.connections}
-        renderItem={item => (
-          <List.Item
-            style={{
-              display: "flex",
-              justifyContent: "space-between"
-            }}
-          >
-            <span
+        <Input value={state.uri} onChange={onUriChange} />
+        <div
+          style={{
+            paddingTop: "7px"
+          }}
+        >
+          <Button type="primary" onClick={addConnectionModal}>
+            Add Connection
+          </Button>
+        </div>
+        <List
+          itemLayout="horizontal"
+          dataSource={state.connections}
+          renderItem={item => (
+            <List.Item
               style={{
-                maxWidth: "147px"
+                display: "flex",
+                justifyContent: "space-between"
               }}
             >
-              <Icon type="link" />
-              &nbsp;
-              {item.name}
-              &nbsp; &nbsp;
-            </span>
-            <span
-              style={{
-                fontSize: "17px"
-              }}
-            >
-              <Icon
-                type="delete"
-                theme="filled"
-                onClick={() => deleteConnection(item.id)}
-              />
-              <Icon
-                type="check-circle"
-                theme="filled"
-                onClick={() => applyConnection(item.uri)}
-              />
-            </span>
-          </List.Item>
-        )}
-      />
-    </Drawer>
+              <span
+                style={{
+                  maxWidth: "147px"
+                }}
+              >
+                <Icon type="link" />
+                &nbsp;
+                <a onClick={() => applyConnection(item.uri)}>{item.name}</a>
+                &nbsp; &nbsp;
+              </span>
+              <span
+                style={{
+                  fontSize: "17px"
+                }}
+              >
+                <Icon
+                  type="delete"
+                  theme="filled"
+                  onClick={() => deleteConnection(item.id)}
+                />
+                <Icon
+                  type="check-circle"
+                  theme="filled"
+                  onClick={() => updateConnection(item.id)}
+                />
+              </span>
+            </List.Item>
+          )}
+        />
+      </Drawer>
+    </div>
   );
 }
 

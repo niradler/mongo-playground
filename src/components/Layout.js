@@ -59,9 +59,10 @@ function MainLayout({ children, runCode, getCollections }) {
             <Menu.Item key="m1">
               <Tooltip title="Query Builder">
                 <Icon
-                  type="edit"
-                  theme="filled"
+                  type={state.queryBuilderModal ? "loading" : "edit"}
+                  theme={state.queryBuilderModal ? "" : "filled"}
                   style={{ fontSize: "25px" }}
+                  disabled={state.queryBuilderModal}
                   onClick={toggleQueryBuilder}
                 />
               </Tooltip>

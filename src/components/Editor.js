@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import brace from "brace";
 import { split as SplitEditor } from "react-ace";
 import electron from "../helpers/electron.helper";
@@ -12,8 +12,8 @@ function Editor() {
   let editor;
   const { state, dispatch } = React.useContext(AppContext);
   const [dimensions, setDimensions] = React.useState({
-    width: "900",
-    height: "680"
+    width: "1200",
+    height: "924"
   });
   const [loaded, setLoaded] = React.useState(false);
 

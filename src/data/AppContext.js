@@ -4,7 +4,7 @@ let AppContext = React.createContext();
 
 let initialState = {
   uri: "mongodb://localhost/test",
-  getTextModal: false,
+  requestTextModal: false,
   connectionsDrawer: false,
   snippetsDrawer: false,
   setGithubTokenModal: false,
@@ -33,7 +33,7 @@ let reducer = (state, action) => {
     case "snippets":
       return { ...state, snippets: action.payload };
     case "code":
-      window.localStorage.setItem("code", action.payload);
+      if (action.payload) window.localStorage.setItem("code", action.payload);
       return { ...state, code: action.payload };
     case "history":
       const history = [action.payload, ...state.history.slice(0, 9)];
@@ -41,7 +41,7 @@ let reducer = (state, action) => {
     case "tested_uri":
       return { ...state, tested_uri: action.payload };
     case "uri":
-      window.localStorage.setItem("uri", action.payload);
+      if (action.payload) window.localStorage.setItem("uri", action.payload);
       return { ...state, uri: action.payload };
     case "log":
       return { ...state, log: action.payload };
@@ -64,8 +64,8 @@ let reducer = (state, action) => {
       return { ...state, connectionsDrawer: !state.connectionsDrawer };
     case "snippetsDrawer":
       return { ...state, snippetsDrawer: !state.snippetsDrawer };
-    case "getTextModal":
-      return { ...state, getTextModal: !state.getTextModal };
+    case "requestTextModal":
+      return { ...state, requestTextModal: !state.requestTextModal };
     case "queryBuilderModal":
       return { ...state, queryBuilderModal: !state.queryBuilderModal };
     case "setGithubTokenModal":

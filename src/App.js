@@ -6,22 +6,11 @@ import github from "./helpers/github.helper";
 import electron from "./helpers/electron.helper";
 import ConnectionsDrawer from "./components/ConnectionsDrawer";
 import SnippetsDrawer from "./components/SnippetsDrawer";
-// import NameModal from "./components/NameModal";
 import SetGithubTokenModal from "./components/SetGithubTokenModal";
 import QueryBuilderModal from "./components/QueryBuilderModal";
 import { Icon, message } from "antd";
 import "./App.css";
 import { AppContext } from "./data/AppContext";
-
-const regGlobalShortcut = () => {
-  const ret = electron.globalShortcut.register("f5", () => {
-    this.runCode();
-  });
-
-  if (!ret) {
-    console.log("registration failed");
-  }
-};
 
 function App() {
   const { state, dispatch } = React.useContext(AppContext);
@@ -39,7 +28,7 @@ function App() {
         setShowEditor(false);
         setTimeout(() => {
           setShowEditor(true);
-        }, 100);
+        }, 150);
       });
 
       await github.init();
@@ -56,6 +45,16 @@ function App() {
     }
   };
 
+  const regGlobalShortcut = () => {
+    const ret = electron.globalShortcut.register("f5", () => {
+      runCode();
+    });
+
+    if (!ret) {
+      console.log("registration failed");
+    }
+  };
+
   const runCode = async () => {
     const { running, code, uri } = state;
     try {
@@ -65,7 +64,10 @@ function App() {
       dispatch({ type: "history", payload: code });
       const client = await DB.getMongoClient(uri);
       var db = client.db();
-      var log = console.log;
+      var log = msg => {
+        dispatch({ type: "log", payload: [...state.log, msg] });
+        console.log(msg);
+      };
       const run = eval(`async function main(db){${code}}; main(db,log);`);
       await run;
       dispatch({ type: "running" });
@@ -107,10 +109,10 @@ function App() {
 
   return (
     <div className="App">
-      <SnippetsDrawer />
-      <ConnectionsDrawer />
-      <SetGithubTokenModal />
-      <QueryBuilderModal />
+      <SnippetsDrawer key="SnippetsDrawer" />
+      <ConnectionsDrawer key="ConnectionsDrawer" />
+      <SetGithubTokenModal key="SetGithubTokenModal" />
+      <QueryBuilderModal key="QueryBuilderModal" />
       <Layout runCode={runCode} getCollections={getCollections}>
         {showEditor ? (
           <Editor />
