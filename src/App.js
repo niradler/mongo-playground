@@ -13,8 +13,7 @@ import SetGithubTokenModal from "./components/SetGithubTokenModal";
 import QueryBuilderModal from "./components/QueryBuilderModal";
 import { message, Icon } from "antd";
 import "./App.css";
-import { fork } from "child_process";
-const isDebug = process.env.DEBUG;
+
 class App extends Component {
   state = {
     mongo_uri: "mongodb://localhost/test",
@@ -102,35 +101,12 @@ class App extends Component {
       if (this.state.running) return;
       this.setState({ log: [], running: true });
       const { code } = this.state;
-      let pid = 0;
-      const runner = require.resolve("./helpers/runner.js");
-      const forked = fork(runner, [isDebug ? "--inspect-brk" : ""], {
-        cwd: __dirname
-      });
-      // forked.unref();
-      forked.send({ code, uri: this.state.mongo_uri });
-      const statusCode = await new Promise(resolve => {
-        forked.on("message", msg => {
-          if (msg.log) this.log(msg.log);
-          if (msg.pid) pid = msg.pid;
-        });
-        forked.on("exit", function(code) {
-          console.log("exit", code);
-          resolve(code);
-        });
-        forked.on("close", function(code) {
-          resolve(code);
-        });
-      });
-
-      if (statusCode === 0) {
-        this.setState({
-          running: false,
-          connection: true
-        });
-      } else {
-        throw new Error("Failed to run.");
-      }
+      const client = await DB.getMongoClient(this.state.mongo_uri);
+      var db = client.db();
+      var log = this.log;
+      const run = eval(`async function main(db){${code}}; main(db,log);`);
+      await run;
+      this.setState({ running: false, connection: true });
     } catch (e) {
       console.log(e);
       this.setState({ running: false, connection: false });
