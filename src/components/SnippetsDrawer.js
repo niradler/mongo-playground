@@ -96,7 +96,7 @@ function SnippetsDrawer() {
   };
 
   return (
-    <div>
+    <React.Fragment>
       {modal && (
         <RequestTextModal action={addSnippet} close={() => setModal(false)} />
       )}
@@ -161,7 +161,7 @@ function SnippetsDrawer() {
           )}
         />
       </Drawer>
-    </div>
+    </React.Fragment>
   );
 }
 

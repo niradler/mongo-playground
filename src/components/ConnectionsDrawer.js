@@ -58,7 +58,7 @@ function ConnectionsDrawer() {
   };
 
   return (
-    <div>
+    <React.Fragment>
       {modal && (
         <RequestTextModal
           action={addConnection}
@@ -122,7 +122,7 @@ function ConnectionsDrawer() {
           )}
         />
       </Drawer>
-    </div>
+    </React.Fragment>
   );
 }
 
