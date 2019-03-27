@@ -2,68 +2,73 @@ import React, { Component } from "react";
 import brace from "brace";
 import { split as SplitEditor } from "react-ace";
 import electron from "../helpers/electron.helper";
-import editor from "../helpers/editor.helper";
+import editorHelper from "../helpers/editor.helper";
+import { AppContext } from "../data/AppContext";
 
 import "brace/mode/javascript";
 import "brace/theme/monokai";
 
-class Editor extends Component {
-  state = {
-    loaded: false,
-    dimensions: {
-      width: "900",
-      height: "680"
-    }
-  };
+function Editor() {
+  let editor;
+  const { state, dispatch } = React.useContext(AppContext);
+  const [dimensions, setDimensions] = React.useState({
+    width: "900",
+    height: "680"
+  });
+  const [loaded, setLoaded] = React.useState(false);
 
-  componentWillMount() {
-    this.setEditorSize();
-  }
-
-  setEditorSize = () => {
+  const setEditorSize = () => {
     const dimensions = electron.getScreenSize();
     dimensions.bounds.height -= 123;
-    this.setState({ dimensions: dimensions.bounds });
+    setDimensions(dimensions.bounds);
   };
 
-  onChange = (...args) => {
+  const onChange = (...args) => {
     try {
       const code = args[0][0];
-      this.props.changeCode(code);
+      dispatch({ type: "code", payload: code });
     } catch (error) {
       console.log("editor error:".error);
     }
   };
 
-  onLoad = editor => {
-    this.setState({ loaded: true });
+  const onLoad = editor => {
+    setLoaded(true);
   };
 
-  render() {
-    return (
-      <div className="Editor">
-        <SplitEditor
-          onLoad={this.onLoad}
-          height={this.state.dimensions.height + "px"}
-          width={"auto"}
-          ref={editor => (this.editor = editor)}
-          mode="javascript"
-          theme="monokai"
-          splits={2}
-          orientation="side"
-          value={[
-            this.props.code,
-            editor.codeFormatter(JSON.stringify(this.props.log))
-          ]}
-          name="ace-editor"
-          setOptions={{ useWorker: false }}
-          editorProps={{ $blockScrolling: true }}
-          showPrintMargin={false}
-          onChange={this.onChange}
-        />
-      </div>
-    );
-  }
+  const output = log => {
+    try {
+      return editorHelper.codeFormatter(JSON.stringify(log));
+    } catch (error) {
+      console.log("output error: ", error);
+      return [];
+    }
+  };
+
+  React.useEffect(() => {
+    setEditorSize();
+  }, []);
+
+  return (
+    <div className="Editor">
+      <SplitEditor
+        onLoad={onLoad}
+        height={dimensions.height + "px"}
+        width={"auto"}
+        ref={_editor => (editor = _editor)}
+        mode="javascript"
+        theme="monokai"
+        splits={2}
+        orientation="side"
+        value={[state.code, output(state.log)]}
+        name="ace-editor"
+        setOptions={{ useWorker: false }}
+        editorProps={{ $blockScrolling: true }}
+        showPrintMargin={false}
+        onChange={onChange}
+      />
+    </div>
+  );
 }
 
 export default Editor;

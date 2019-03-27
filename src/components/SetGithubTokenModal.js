@@ -1,20 +1,27 @@
 import React from "react";
 import GeneralModal from "./GeneralModal";
 import { Input } from "antd";
+import { AppContext } from "../data/AppContext";
+import electron from "../helpers/electron.helper";
 
-const SetGithubTokenModal = props => {
-  const [token, setToken] = React.useState(props.token);
+function SetGithubTokenModal() {
+  const { state, dispatch } = React.useContext(AppContext);
+  const [token, setToken] = React.useState(
+    electron.store.get("github_api_key")
+  );
   const change = e => setToken(e.target.value);
 
+  const close = () => dispatch({ type: "setGithubTokenModal" });
+  const onOk = () => {
+    electron.store.set("github_api_key", token);
+    close();
+  };
   return (
     <GeneralModal
       title="Github Token"
-      visible={props.visible}
-      onOk={() => {
-        props.onOk(token);
-        props.onCancel();
-      }}
-      onCancel={props.onCancel}
+      visible={state.setGithubTokenModal}
+      onOk={onOk}
+      onCancel={close}
       okButtonProps={{ disabled: !token || (token && token.length === 0) }}
     >
       <p>
@@ -30,6 +37,6 @@ const SetGithubTokenModal = props => {
       <Input value={token} onChange={change} />
     </GeneralModal>
   );
-};
+}
 
 export default SetGithubTokenModal;

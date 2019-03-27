@@ -1,20 +1,32 @@
 import React from "react";
-import { Layout, Menu, Input, Tooltip, Icon } from "antd";
+import { Layout, Menu, Input, Tooltip, Icon, message } from "antd";
+import { AppContext } from "../data/AppContext";
 import "./Layout.css";
 const { Header, Content } = Layout;
 
-function MainLayout({
-  children,
-  mongo_uri,
-  changeMongoUri,
-  runCode,
-  openFavoritesDrawer,
-  openSnippetsDrawer,
-  toggleQueryBuilderModal,
-  codeBeautify,
-  exportFile,
-  running
-}) {
+function MainLayout({ children, runCode, getCollections }) {
+  const { state, dispatch } = React.useContext(AppContext);
+
+  const toggleConnections = () => dispatch({ type: "connectionsDrawer" });
+
+  const toggleSnippets = () => dispatch({ type: "snippetsDrawer" });
+
+  const toggleQueryBuilder = async () => {
+    try {
+      await getCollections();
+      dispatch({ type: "queryBuilderModal" });
+    } catch (error) {
+      console.log(error);
+      message.error(error.message);
+    }
+  };
+
+  const CodeFormat = () => dispatch({ type: "codeFormat" });
+
+  const exportCode = () => dispatch({ type: "exportCode" });
+
+  const onUriChange = e => dispatch({ type: "uri", payload: e.target.value });
+
   return (
     <Layout className="Layout">
       <Header
@@ -27,7 +39,7 @@ function MainLayout({
         <div>
           <Menu theme="dark" mode="horizontal" style={{ lineHeight: "64px" }}>
             <Menu.Item key="2" style={{ width: "500px" }}>
-              <Input value={mongo_uri} onChange={changeMongoUri} />
+              <Input value={state.uri} onChange={onUriChange} />
             </Menu.Item>
           </Menu>
         </div>
@@ -40,7 +52,7 @@ function MainLayout({
                   type="save"
                   theme="filled"
                   style={{ fontSize: "25px" }}
-                  onClick={exportFile}
+                  onClick={exportCode}
                 />
               </Tooltip>
             </Menu.Item>
@@ -50,7 +62,7 @@ function MainLayout({
                   type="edit"
                   theme="filled"
                   style={{ fontSize: "25px" }}
-                  onClick={toggleQueryBuilderModal}
+                  onClick={toggleQueryBuilder}
                 />
               </Tooltip>
             </Menu.Item>
@@ -60,17 +72,17 @@ function MainLayout({
                   type="highlight"
                   theme="filled"
                   style={{ fontSize: "25px" }}
-                  onClick={codeBeautify}
+                  onClick={CodeFormat}
                 />
               </Tooltip>
             </Menu.Item>
             <Menu.Item key="m3">
               <Tooltip title="Connections">
                 <Icon
-                  type="plus-circle"
+                  type="star"
                   theme="filled"
                   style={{ fontSize: "25px" }}
-                  onClick={openFavoritesDrawer}
+                  onClick={toggleConnections}
                 />
               </Tooltip>
             </Menu.Item>
@@ -80,15 +92,15 @@ function MainLayout({
                   type="snippets"
                   theme="filled"
                   style={{ fontSize: "25px" }}
-                  onClick={openSnippetsDrawer}
+                  onClick={toggleSnippets}
                 />
               </Tooltip>
             </Menu.Item>
             <Menu.Item key="m5">
               <Tooltip title="Run">
                 <Icon
-                  type={running ? "loading" : "caret-right"}
-                  theme={running ? "" : "filled"}
+                  type={state.running ? "loading" : "caret-right"}
+                  theme={state.running ? "" : "filled"}
                   style={{ fontSize: "25px" }}
                   onClick={runCode}
                 />
