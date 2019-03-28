@@ -20,7 +20,8 @@ function App() {
     try {
       const code = window.localStorage.getItem("code") || "";
       const uri = window.localStorage.getItem("uri") || "";
-      let history = window.localStorage.getItem("history") || [];
+      let history =
+        window.localStorage.getItem("history") || JSON.stringify([]);
       history = JSON.parse(history);
       const snippets = electron.store.get("snippets") || [];
       const connections = electron.store.get("favorites") || [];
