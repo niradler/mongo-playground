@@ -3,7 +3,7 @@ import actions from "./actions";
 let AppContext = React.createContext();
 
 let initialState = {
-  uri: "mongodb://localhost/test",
+  uri: "",
   requestTextModal: false,
   connectionsDrawer: false,
   snippetsDrawer: false,

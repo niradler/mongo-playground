@@ -19,7 +19,8 @@ function App() {
   const init = async () => {
     try {
       const code = window.localStorage.getItem("code") || "";
-      const uri = window.localStorage.getItem("uri") || "";
+      const uri =
+        window.localStorage.getItem("uri") || "mongodb://localhost/test";
       let history =
         window.localStorage.getItem("history") || JSON.stringify([]);
       history = JSON.parse(history);
@@ -70,8 +71,10 @@ function App() {
         dispatch({ type: "log", payload: [...state.log, msg] });
         console.log(msg);
       };
+      console.time("executing");
       const run = eval(`async function main(db){${code}}; main(db,log);`);
       await run;
+      console.timeEnd("executing");
       dispatch({ type: "running" });
       dispatch({ type: "tested_uri", payload: uri });
     } catch (error) {

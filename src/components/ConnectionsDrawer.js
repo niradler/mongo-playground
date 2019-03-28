@@ -1,5 +1,5 @@
 import React from "react";
-import { Drawer, Input, List, Icon, Button } from "antd";
+import { Drawer, Input, List, Icon, Button, Popconfirm } from "antd";
 import { AppContext } from "../data/AppContext";
 import randomstring from "randomstring";
 import electron from "../helpers/electron.helper";
@@ -107,16 +107,22 @@ function ConnectionsDrawer() {
                   fontSize: "17px"
                 }}
               >
-                <Icon
-                  type="delete"
-                  theme="filled"
-                  onClick={() => deleteConnection(item.id)}
-                />
-                <Icon
-                  type="save"
-                  theme="filled"
-                  onClick={() => updateConnection(item.id)}
-                />
+                <Popconfirm
+                  title="Delete this connection?"
+                  onConfirm={() => deleteConnection(item.id)}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <Icon type="delete" theme="filled" />
+                </Popconfirm>
+                <Popconfirm
+                  title="Update this connection?"
+                  onConfirm={() => updateConnection(item.id)}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <Icon type="save" theme="filled" />
+                </Popconfirm>
               </span>
             </List.Item>
           )}
