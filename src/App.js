@@ -20,9 +20,10 @@ function App() {
     try {
       const code = window.localStorage.getItem("code") || "";
       const uri = window.localStorage.getItem("uri") || "";
+      let history = window.localStorage.getItem("history") || [];
+      history = JSON.parse(history);
       const snippets = electron.store.get("snippets") || [];
       const connections = electron.store.get("favorites") || [];
-      const history = electron.store.get("history") || [];
 
       window.addEventListener("resize", e => {
         setShowEditor(false);
