@@ -113,7 +113,7 @@ function ConnectionsDrawer() {
                   onClick={() => deleteConnection(item.id)}
                 />
                 <Icon
-                  type="check-circle"
+                  type="save"
                   theme="filled"
                   onClick={() => updateConnection(item.id)}
                 />
