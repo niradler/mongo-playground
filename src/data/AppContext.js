@@ -3,7 +3,7 @@ import actions from "./actions";
 let AppContext = React.createContext();
 
 let initialState = {
-  uri: "mongodb://localhost/test",
+  uri: "",
   requestTextModal: false,
   connectionsDrawer: false,
   snippetsDrawer: false,
@@ -37,6 +37,8 @@ let reducer = (state, action) => {
       return { ...state, code: action.payload };
     case "history":
       const history = [action.payload, ...state.history.slice(0, 9)];
+      if (action.payload)
+        window.localStorage.setItem("history", JSON.stringify(history));
       return { ...state, history };
     case "tested_uri":
       return { ...state, tested_uri: action.payload };

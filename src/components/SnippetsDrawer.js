@@ -1,5 +1,5 @@
 import React from "react";
-import { Drawer, Button, List, Icon, message } from "antd";
+import { Drawer, Button, List, Icon, message, Popconfirm } from "antd";
 import { AppContext } from "../data/AppContext";
 import electron from "../helpers/electron.helper";
 import github from "../helpers/github.helper";
@@ -145,17 +145,23 @@ function SnippetsDrawer() {
                   fontSize: "17px"
                 }}
               >
-                <Icon
-                  type="delete"
-                  theme="filled"
-                  onClick={() => deleteSnippet(item.id)}
-                />
+                <Popconfirm
+                  title="Delete this snippet?"
+                  onConfirm={() => deleteSnippet(item.id)}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <Icon type="delete" theme="filled" />
+                </Popconfirm>
                 <Icon type="share-alt" onClick={() => shareCode(item)} />
-                <Icon
-                  type="save"
-                  theme="filled"
-                  onClick={() => updateSnippet({ ...item, code: state.code })}
-                />
+                <Popconfirm
+                  title="Update this snippet?"
+                  onConfirm={() => updateSnippet({ ...item, code: state.code })}
+                  okText="Yes"
+                  cancelText="No"
+                >
+                  <Icon type="save" theme="filled" />
+                </Popconfirm>
               </span>
             </List.Item>
           )}
