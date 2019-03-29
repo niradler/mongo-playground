@@ -1,15 +1,50 @@
 import React from "react";
-import brace from "brace";
+import ace from "brace";
+import "brace/mode/javascript";
+import "brace/theme/monokai";
+import "brace/ext/spellcheck";
+import "brace/ext/language_tools";
+import "brace/snippets/javascript";
+import "brace/ext/searchbox";
+import {
+  QueryAutoCompleter,
+  StageAutoCompleter
+} from "mongodb-ace-autocompleter";
 import { split as SplitEditor } from "react-ace";
 import electron from "../helpers/electron.helper";
 import editorHelper from "../helpers/editor.helper";
 import { AppContext } from "../data/AppContext";
 
-import "brace/mode/javascript";
-import "brace/theme/monokai";
+const tools = window.ace.acequire("ace/ext/language_tools");
+const textCompleter = tools.textCompleter;
+const queryAutoCompleter = new QueryAutoCompleter("3.6.0", textCompleter, [
+  {
+    name: "name",
+    value: "name",
+    score: 1,
+    meta: "field",
+    version: "0.0.0"
+  }
+]);
+// const stageAutoCompleter = new StageAutoCompleter(
+//   "3.6.0",
+//   textCompleter,
+//   [
+//     {
+//       name: "name",
+//       value: "name",
+//       score: 1,
+//       meta: "field",
+//       version: "0.0.0"
+//     }
+//   ],
+//   "$match"
+// );
+debugger;
+tools.setCompleters([queryAutoCompleter]);
 
 function Editor() {
-  let editor;
+  let currentEditor;
   const { state, dispatch } = React.useContext(AppContext);
   const [dimensions, setDimensions] = React.useState({
     width: "1200",
@@ -33,6 +68,7 @@ function Editor() {
   };
 
   const onLoad = editor => {
+    currentEditor = editor.getCurrentEditor();
     setLoaded(true);
   };
 
@@ -56,7 +92,7 @@ function Editor() {
           onLoad={onLoad}
           height={dimensions.height + "px"}
           width={"auto"}
-          ref={_editor => (editor = _editor)}
+          ref={_editor => (currentEditor = _editor)}
           mode="javascript"
           theme="monokai"
           splits={2}
@@ -67,6 +103,9 @@ function Editor() {
           editorProps={{ $blockScrolling: true }}
           showPrintMargin={false}
           onChange={onChange}
+          enableBasicAutocompletion={true}
+          enableLiveAutocompletion={true}
+          enableSnippets={true}
         />
       )}
     </div>

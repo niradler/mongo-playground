@@ -45,16 +45,6 @@ function App() {
     }
   };
 
-  const regGlobalShortcut = () => {
-    const ret = electron.globalShortcut.register("f5", () => {
-      runCode();
-    });
-
-    if (!ret) {
-      console.log("registration failed");
-    }
-  };
-
   const runCode = async () => {
     const { running, code, uri } = state;
     try {
@@ -100,6 +90,14 @@ function App() {
       dispatch({ type: "tested_uri", payload: false });
       dispatch({ type: "collections", payload: [] });
       throw error;
+    }
+  };
+
+  const regGlobalShortcut = () => {
+    const ret = electron.globalShortcut.register("f5", runCode);
+
+    if (!ret) {
+      console.log("registration failed");
     }
   };
 
