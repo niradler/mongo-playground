@@ -23,12 +23,15 @@ const reload = () => {
   getCurrentWindow().reload();
 };
 
-const downloadFile = fileString => {
+const downloadFile = (
+  fileString,
+  type = { name: "JavaScript", extensions: ["js"] }
+) => {
   let savePath = dialog.showSaveDialog({
-    filters: [{ name: "JavaScript", extensions: ["js"] }]
+    filters: [type]
   });
   if (!savePath) return;
-  if (!savePath.includes(".js")) savePath += ".js";
+  // if (!savePath.includes(".js")) savePath += ".js";
 
   return writeFile(savePath, fileString);
 };

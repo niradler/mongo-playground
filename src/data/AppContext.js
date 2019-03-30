@@ -9,6 +9,7 @@ let initialState = {
   snippetsDrawer: false,
   setGithubTokenModal: false,
   queryBuilderModal: false,
+  exportModal: false,
   connections: [],
   snippets: [],
   log: [],
@@ -50,8 +51,14 @@ let reducer = (state, action) => {
     case "collections":
       return { ...state, collections: action.payload };
     //actions
+    case "exportCSV":
+      actions.exportCSV(state.log);
+      return state;
     case "exportCode":
       actions.exportCode(state.code, state.uri);
+      return state;
+    case "exportOutput":
+      actions.exportOutput(state.log);
       return state;
     case "codeFormat":
       const format = actions.codeFormat(state.code);
@@ -68,6 +75,8 @@ let reducer = (state, action) => {
       return { ...state, snippetsDrawer: !state.snippetsDrawer };
     case "requestTextModal":
       return { ...state, requestTextModal: !state.requestTextModal };
+    case "exportModal":
+      return { ...state, exportModal: !state.exportModal };
     case "queryBuilderModal":
       return { ...state, queryBuilderModal: !state.queryBuilderModal };
     case "setGithubTokenModal":

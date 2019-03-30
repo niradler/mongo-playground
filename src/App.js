@@ -8,6 +8,7 @@ import ConnectionsDrawer from "./components/ConnectionsDrawer";
 import SnippetsDrawer from "./components/SnippetsDrawer";
 import SetGithubTokenModal from "./components/SetGithubTokenModal";
 import QueryBuilderModal from "./components/QueryBuilderModal";
+import ExportModal from "./components/ExportModal";
 import { Icon, message } from "antd";
 import "./App.css";
 import { AppContext } from "./data/AppContext";
@@ -56,6 +57,7 @@ function App() {
       dispatch({ type: "log", payload: [] });
       dispatch({ type: "history", payload: code });
       const client = await DB.getMongoClient(uri);
+      var mongodb = require("mongodb");
       var db = client.db();
       var log = msg => {
         dispatch({ type: "log", payload: [...state.log, msg] });
@@ -112,6 +114,7 @@ function App() {
 
   return (
     <div className="App">
+      <ExportModal key="ExportModal" />
       <SnippetsDrawer key="SnippetsDrawer" />
       <ConnectionsDrawer key="ConnectionsDrawer" />
       <SetGithubTokenModal key="SetGithubTokenModal" />

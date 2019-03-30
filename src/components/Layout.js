@@ -23,7 +23,7 @@ function MainLayout({ children, runCode, getCollections }) {
 
   const CodeFormat = () => dispatch({ type: "codeFormat" });
 
-  const exportCode = () => dispatch({ type: "exportCode" });
+  const exportCode = () => dispatch({ type: "exportModal" });
 
   const onUriChange = e => dispatch({ type: "uri", payload: e.target.value });
 

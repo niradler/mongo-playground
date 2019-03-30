@@ -7,7 +7,8 @@ function GeneralModal({
   onOk,
   onCancel,
   okButtonProps = {},
-  children
+  children,
+  footer
 }) {
   return (
     <Modal
@@ -16,6 +17,7 @@ function GeneralModal({
       onOk={onOk}
       onCancel={onCancel}
       okButtonProps={okButtonProps}
+      footer={footer}
     >
       {children}
     </Modal>

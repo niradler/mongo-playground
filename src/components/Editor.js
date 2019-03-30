@@ -6,10 +6,7 @@ import "brace/ext/spellcheck";
 import "brace/ext/language_tools";
 import "brace/snippets/javascript";
 import "brace/ext/searchbox";
-import {
-  QueryAutoCompleter,
-  StageAutoCompleter
-} from "mongodb-ace-autocompleter";
+import { QueryAutoCompleter } from "mongodb-ace-autocompleter";
 import { split as SplitEditor } from "react-ace";
 import electron from "../helpers/electron.helper";
 import editorHelper from "../helpers/editor.helper";
@@ -26,21 +23,6 @@ const queryAutoCompleter = new QueryAutoCompleter("3.6.0", textCompleter, [
     version: "0.0.0"
   }
 ]);
-// const stageAutoCompleter = new StageAutoCompleter(
-//   "3.6.0",
-//   textCompleter,
-//   [
-//     {
-//       name: "name",
-//       value: "name",
-//       score: 1,
-//       meta: "field",
-//       version: "0.0.0"
-//     }
-//   ],
-//   "$match"
-// );
-debugger;
 tools.setCompleters([queryAutoCompleter]);
 
 function Editor() {

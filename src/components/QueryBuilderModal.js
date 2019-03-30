@@ -14,7 +14,9 @@ const generateMongoCode = query => {
   ${
     !query.action.includes("One") && query.action.includes("find")
       ? `${
-          query.sort ? `.sort(${JSON.stringify(query.sort, undefined, 2)})` : ""
+          query.sort && Object.keys(query.sort).length > 0
+            ? `.sort(${JSON.stringify(query.sort, undefined, 2)})`
+            : ""
         }${query.limit ? `.limit(${query.limit})` : ""}${
           query.skip ? `.skip(${query.skip})` : ""
         }.toArray()`

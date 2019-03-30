@@ -1,5 +1,6 @@
 import editor from "../helpers/editor.helper";
 import electron from "../helpers/electron.helper";
+const { Parser } = require("json2csv");
 
 const codeFormat = code => {
   try {
@@ -30,7 +31,31 @@ const exportCode = (code, uri) => {
     exportData = editor.codeFormatter(exportData);
   } catch (error) {}
 
-  electron.downloadFile(exportData);
+  electron.downloadFile(exportData, { name: "JavaScript", extensions: ["js"] });
 };
 
-export default { codeFormat, exportCode };
+const exportOutput = log => {
+  try {
+    log = JSON.stringify(log, undefined, 2);
+  } catch (error) {}
+  electron.downloadFile(log, { name: "JSON", extensions: ["json"] });
+};
+
+const exportCSV = log => {
+  log.forEach(el => {
+    try {
+      const fields = Object.keys(el.length ? el[0] : el);
+      const opts = { fields };
+      const parser = new Parser(opts);
+      const csv = parser.parse(el);
+      electron.downloadFile(csv, {
+        name: "csv",
+        extensions: ["csv"]
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  });
+};
+
+export default { codeFormat, exportCode, exportOutput, exportCSV };
