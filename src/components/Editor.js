@@ -6,7 +6,10 @@ import "brace/ext/spellcheck";
 import "brace/ext/language_tools";
 import "brace/snippets/javascript";
 import "brace/ext/searchbox";
-import { QueryAutoCompleter } from "mongodb-ace-autocompleter";
+import {
+  QueryAutoCompleter,
+  StageAutoCompleter
+} from "mongodb-ace-autocompleter";
 import { split as SplitEditor } from "react-ace";
 import electron from "../helpers/electron.helper";
 import editorHelper from "../helpers/editor.helper";
@@ -23,7 +26,37 @@ const queryAutoCompleter = new QueryAutoCompleter("3.6.0", textCompleter, [
     version: "0.0.0"
   }
 ]);
-tools.setCompleters([queryAutoCompleter]);
+const stageAutoCompleter = new StageAutoCompleter(
+  "3.6.0",
+  textCompleter,
+  [
+    {
+      name: "name",
+      value: "name",
+      score: 1,
+      meta: "field",
+      version: "0.0.0"
+    }
+  ],
+  "$match"
+);
+// var customCompleter = {
+//   getCompletions: function(editor, session, pos, prefix, callback) {
+//     console.log(editor, session, pos, prefix);
+//     callback(null, [
+//       {
+//         name: "name",
+//         value: "name",
+//         score: 1,
+//         meta: "field",
+//         icon: "method"
+//       }
+//     ]);
+//   }
+// };
+
+const completers = [queryAutoCompleter, stageAutoCompleter];
+tools.setCompleters(completers);
 
 function Editor() {
   let currentEditor;
@@ -51,6 +84,7 @@ function Editor() {
 
   const onLoad = editor => {
     currentEditor = editor.getCurrentEditor();
+    //editor.completers = [completers]
     setLoaded(true);
   };
 
