@@ -4,6 +4,7 @@
   "private": true,
   "homepage": "./",
   "main": "build/electron.js",
+  "description": "Mongo Playground is a simple tool, to write and test migration and quries for mongodb.",
   "dependencies": {
     "@babel/core": "7.2.2",
     "@svgr/webpack": "4.1.0",
@@ -81,7 +82,7 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "dist:platform": "electron-builder -mwl",
-    "all": "npm i && electron-builder install-app-deps npm run build && electron-builder"
+    "all": "npm i && electron-builder install-app-deps && npm run build && electron-builder"
   },
   "eslintConfig": {
     "extends": "react-app"

@@ -59,14 +59,16 @@ function App() {
       const client = await DB.getMongoClient(uri);
       var mongodb = require("mongodb");
       var db = client.db();
+      let output = [];
       var log = msg => {
-        dispatch({ type: "log", payload: [...state.log, msg] });
+        output = [...output, msg];
         console.log(msg);
       };
       console.time("executing");
       const run = eval(`async function main(db){${code}}; main(db,log);`);
       await run;
       console.timeEnd("executing");
+      dispatch({ type: "log", payload: output });
       dispatch({ type: "running" });
       dispatch({ type: "tested_uri", payload: uri });
     } catch (error) {
