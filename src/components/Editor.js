@@ -56,7 +56,7 @@ const stageAutoCompleter = new StageAutoCompleter(
 // };
 
 const completers = [queryAutoCompleter, stageAutoCompleter];
-tools.setCompleters(completers);
+// tools.setCompleters(completers);
 
 function Editor() {
   let currentEditor;
@@ -84,7 +84,7 @@ function Editor() {
 
   const onLoad = editor => {
     currentEditor = editor.getCurrentEditor();
-    //editor.completers = [completers]
+    currentEditor.completers = [...currentEditor.completers, ...completers];
     setLoaded(true);
   };
 
