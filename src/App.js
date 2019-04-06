@@ -12,6 +12,7 @@ import ExportModal from "./components/ExportModal";
 import { Icon, message } from "antd";
 import "./App.css";
 import { AppContext } from "./data/AppContext";
+const ipc = require("electron-better-ipc");
 
 function App() {
   const { state, dispatch } = React.useContext(AppContext);
@@ -49,31 +50,38 @@ function App() {
     }
   };
 
-  const runCode = async () => {
-    const { running, code, uri } = state;
+  const restartWorker = async () => {
     try {
-      dispatch({ type: "running" });
+      dispatch({ type: "running", payload: false });
+      dispatch({ type: "restart", payload: true });
+      const response = await ipc.callMain("restart-worker");
+      setTimeout(() => dispatch({ type: "restart", payload: false }), 800);
+      console.log({ restart: response });
+    } catch (error) {
+      console.log(error);
+      dispatch({ type: "restart", payload: false });
+      message.error(error.message);
+    }
+  };
+
+  const runCode = async () => {
+    const { running, code, uri, restart } = state;
+    try {
+      dispatch({ type: "running", payload: true });
       if (running || !code) throw new Error("Unable to run.");
-      dispatch({ type: "log", payload: [] });
+      if (restart) throw new Error("Restarting worker.");
+      dispatch({ type: "log", payload: "" });
       dispatch({ type: "history", payload: code });
-      const client = await DB.getMongoClient(uri);
-      var mongodb = require("mongodb");
-      var db = client.db();
-      let output = [];
-      var log = msg => {
-        output = [...output, msg];
-        console.log(msg);
-      };
-      console.time("executing");
-      const run = eval(`async function main(db){${code}}; main(db,log);`);
-      await run;
-      console.timeEnd("executing");
-      dispatch({ type: "log", payload: output });
-      dispatch({ type: "running" });
+
+      const response = await ipc.callMain("run-code", { code, uri });
+      console.log({ response });
+      message.success(`Executing time ${response.endAt} ms`);
+      dispatch({ type: "log", payload: response.output });
+      dispatch({ type: "running", payload: false });
       dispatch({ type: "tested_uri", payload: uri });
     } catch (error) {
       console.log(error);
-      dispatch({ type: "running" });
+      dispatch({ type: "running", payload: false });
       dispatch({ type: "tested_uri", payload: false });
       message.error(error.message);
     }
@@ -121,7 +129,11 @@ function App() {
       <ConnectionsDrawer key="ConnectionsDrawer" />
       <SetGithubTokenModal key="SetGithubTokenModal" />
       <QueryBuilderModal key="QueryBuilderModal" />
-      <Layout runCode={runCode} getCollections={getCollections}>
+      <Layout
+        runCode={runCode}
+        getCollections={getCollections}
+        restartWorker={restartWorker}
+      >
         {showEditor ? (
           <Editor />
         ) : (

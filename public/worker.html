@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="theme-color" content="#000000" />
+    <title>Mongo Playground Worker</title>
+  </head>
+  <body>
+    <p>worker</p>
+
+    <script>
+      const ipc = require("electron-better-ipc");
+      var mongodb = require("mongodb");
+      var MongoClient = mongodb.MongoClient;
+      let clients = {};
+
+      const getMongoClient = async uri => {
+        if (!clients[uri]) {
+          clients[uri] = await MongoClient.connect(uri, {
+            useNewUrlParser: true
+          });
+
+          return clients[uri];
+        }
+        return clients[uri];
+      };
+
+      ipc.answerMain("run-code-worker", async task => {
+        try {
+          var client = await getMongoClient(task.uri);
+          var db = client.db();
+          let output = [];
+          var log = msg => {
+            output = [...output, msg];
+            console.log(msg);
+          };
+          const startAt = Date.now();
+          const run = eval(`async function main(){${task.code}}; main();`);
+          await run;
+          let endAt = Date.now() - startAt;
+          endAt = endAt < 0 ? 0 : endAt;
+
+          return { output: output.length === 1 ? output[0] : output, endAt };
+        } catch (error) {
+          console.log(error);
+          return { output: error.message, endAt: 0 };
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -29,20 +29,20 @@ function ExportModal() {
         <Button
           style={{ marginRight: "20px" }}
           onClick={exportCode}
-          disabled={state.code.length === 0}
+          disabled={state.code && state.code.length === 0}
         >
           Code
         </Button>
         <Button
           style={{ marginRight: "20px" }}
           onClick={exportOutput}
-          disabled={state.log.length === 0}
+          disabled={state.log && state.log.length === 0}
         >
           Output
         </Button>
         <Button
           style={{ marginRight: "20px" }}
-          disabled={state.log.length === 0}
+          disabled={state.log && state.log.length === 0}
           onClick={exportCSV}
         >
           CSV

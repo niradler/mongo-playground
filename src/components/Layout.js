@@ -4,7 +4,7 @@ import { AppContext } from "../data/AppContext";
 import "./Layout.css";
 const { Header, Content } = Layout;
 
-function MainLayout({ children, runCode, getCollections }) {
+function MainLayout({ children, runCode, getCollections, restartWorker }) {
   const { state, dispatch } = React.useContext(AppContext);
 
   const toggleConnections = () => dispatch({ type: "connectionsDrawer" });
@@ -98,14 +98,18 @@ function MainLayout({ children, runCode, getCollections }) {
               </Tooltip>
             </Menu.Item>
             <Menu.Item key="m5">
-              <Tooltip title="Run">
-                <Icon
-                  type={state.running ? "loading" : "caret-right"}
-                  theme={state.running ? "" : "filled"}
-                  style={{ fontSize: "25px" }}
-                  onClick={runCode}
-                />
-              </Tooltip>
+              {state.restart ? (
+                <Icon type="loading" style={{ fontSize: "25px" }} />
+              ) : (
+                <Tooltip title="Run">
+                  <Icon
+                    type={state.running ? "close-square" : "caret-right"}
+                    theme={"filled"}
+                    style={{ fontSize: "25px" }}
+                    onClick={state.running ? restartWorker : runCode}
+                  />
+                </Tooltip>
+              )}
             </Menu.Item>
           </Menu>
         </div>
