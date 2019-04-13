@@ -20,6 +20,11 @@ Simple way to test mongo queries, and save them for later use.
 - ![snippets](https://github.com/niradler/mongo-playground/blob/master/assets/snippets.png)
 - Run (f5)
 
+
+## Development
+- npm i
+- npm run dev
+
 ## TDOO:
 
 - improve query builder

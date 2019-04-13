@@ -19,10 +19,6 @@ function SnippetsDrawer() {
         const { snippets } = state;
         const files = {};
         if (snippets.length > 0) {
-          files[`${snippets.length} - Mongo Playground - Snippets`] = {
-            content:
-              "Mongo Playground snippets. https://github.com/niradler/mongo-playground"
-          };
           for (let i = 0; i < snippets.length; i++) {
             const snippet = snippets[i];
             files[`mp-${snippet.title}.js`] = { content: snippet.code };
