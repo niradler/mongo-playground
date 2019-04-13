@@ -12,12 +12,13 @@ let initialState = {
   exportModal: false,
   connections: [],
   snippets: [],
-  log: [],
+  log: "",
   name: "",
   currentOp: "",
   code: "",
   showEditor: true,
   running: false,
+  restart: false,
   collections: [],
   connection: false,
   tested_uri: null,
@@ -50,6 +51,10 @@ let reducer = (state, action) => {
       return { ...state, log: action.payload };
     case "collections":
       return { ...state, collections: action.payload };
+    case "running":
+      return { ...state, running: action.payload };
+    case "restart":
+      return { ...state, restart: action.payload };
     //actions
     case "exportCSV":
       actions.exportCSV(state.log);
@@ -67,8 +72,6 @@ let reducer = (state, action) => {
     //toggle
     case "showEditor":
       return { ...state, showEditor: !state.showEditor };
-    case "running":
-      return { ...state, running: !state.running };
     case "connectionsDrawer":
       return { ...state, connectionsDrawer: !state.connectionsDrawer };
     case "snippetsDrawer":

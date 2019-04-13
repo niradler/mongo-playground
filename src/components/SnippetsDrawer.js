@@ -23,12 +23,15 @@ function SnippetsDrawer() {
             const snippet = snippets[i];
             files[`mp-${snippet.title}.js`] = { content: snippet.code };
           }
+
           await github.sync(files);
+          message.success("Sync successfully");
         }
       } else {
         dispatch({ type: "setGithubTokenModal" });
       }
     } catch (error) {
+      console.log(error);
       message.error(error.message);
     }
   };
@@ -68,6 +71,7 @@ function SnippetsDrawer() {
       }
       setModal(false);
     } catch (error) {
+      console.log(error);
       message.error(error.message);
     }
   };

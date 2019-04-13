@@ -14,7 +14,7 @@ const init = async () => {
         description:
           "Mongo Playground snippets. https://github.com/niradler/mongo-playground",
         files: {
-          [`mp-all snippets`]: {
+          [`0 - Mongo Playground - Snippets`]: {
             content:
               "Mongo Playground snippets. https://github.com/niradler/mongo-playground"
           }

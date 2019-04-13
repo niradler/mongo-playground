@@ -31,7 +31,6 @@ const downloadFile = (
     filters: [type]
   });
   if (!savePath) return;
-  // if (!savePath.includes(".js")) savePath += ".js";
 
   return writeFile(savePath, fileString);
 };

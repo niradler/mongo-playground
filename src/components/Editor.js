@@ -56,7 +56,6 @@ const stageAutoCompleter = new StageAutoCompleter(
 // };
 
 const completers = [queryAutoCompleter, stageAutoCompleter];
-// tools.setCompleters(completers);
 
 function Editor() {
   let currentEditor;
@@ -90,10 +89,11 @@ function Editor() {
 
   const output = log => {
     try {
-      return editorHelper.codeFormatter(JSON.stringify(log));
+      if (!log) return `${log}`;
+      return JSON.stringify(log, null, 2);
     } catch (error) {
       console.log("output error: ", error);
-      return [];
+      return error.message;
     }
   };
 
