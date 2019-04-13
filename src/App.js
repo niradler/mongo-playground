@@ -104,6 +104,7 @@ function App() {
 
       return true;
     } catch (error) {
+      console.log(error);
       dispatch({ type: "tested_uri", payload: false });
       dispatch({ type: "collections", payload: [] });
       throw error;

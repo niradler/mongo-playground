@@ -13,7 +13,8 @@ const codeFormat = code => {
 
 const exportCode = (code, uri) => {
   let exportData = `
-    const MongoClient = require("mongodb").MongoClient;
+  const mongodb = require("mongodb")
+    const MongoClient = mongodb.MongoClient;
     const log = console.log;
     
      async function main(){
@@ -42,6 +43,9 @@ const exportOutput = log => {
 };
 
 const exportCSV = log => {
+  if (log && !log.length) {
+    log = [log];
+  }
   log.forEach(el => {
     try {
       const fields = Object.keys(el.length ? el[0] : el);

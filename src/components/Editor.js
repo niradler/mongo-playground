@@ -89,8 +89,8 @@ function Editor() {
 
   const output = log => {
     try {
-      if (!log) return "";
-      return editorHelper.codeFormatter(JSON.stringify(log));
+      if (!log) return `${log}`;
+      return JSON.stringify(log, null, 2);
     } catch (error) {
       console.log("output error: ", error);
       return error.message;

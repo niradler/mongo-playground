@@ -18,15 +18,32 @@
       var mongodb = require("mongodb");
       var MongoClient = mongodb.MongoClient;
       let clients = {};
+      let reuse = false;
+
+      const cleanOutput = output => {
+        output = output.length === 1 ? output[0] : output;
+        output = JSON.parse(JSON.stringify(output));
+        return output;
+      };
 
       const getMongoClient = async uri => {
+        const tenMinutes = 1000 * 60 * 10;
+        const opt = {
+          useNewUrlParser: true,
+          server: {
+            socketOptions: {
+              socketTimeoutMS: tenMinutes,
+              connectTimeoutMS: tenMinutes
+            }
+          }
+        };
+
         if (!clients[uri]) {
-          clients[uri] = await MongoClient.connect(uri, {
-            useNewUrlParser: true
-          });
+          clients[uri] = await MongoClient.connect(uri, opt);
 
           return clients[uri];
         }
+        reuse = true;
         return clients[uri];
       };
 
@@ -41,11 +58,16 @@
           };
           const startAt = Date.now();
           const run = eval(`async function main(){${task.code}}; main();`);
-          await run;
+          const debug = await run;
           let endAt = Date.now() - startAt;
           endAt = endAt < 0 ? 0 : endAt;
 
-          return { output: output.length === 1 ? output[0] : output, endAt };
+          return {
+            output: cleanOutput(output),
+            endAt,
+            reuse,
+            debug
+          };
         } catch (error) {
           console.log(error);
           return { output: error.message, endAt: 0 };
