@@ -31,5 +31,3 @@ Simple way to test mongo queries, and save them for later use.
 - auto complete
 - npm imports
 - restore snippets
-- execute time
-- export output to json
