@@ -21,8 +21,11 @@
       let reuse = false;
 
       const cleanOutput = output => {
-        output = output.length === 1 ? output[0] : output;
-        output = JSON.parse(JSON.stringify(output));
+        try{
+          output = output.length === 1 ? output[0] : output;
+          output = JSON.parse(JSON.stringify(output));
+        }catch(e){}
+
         return output;
       };
 
