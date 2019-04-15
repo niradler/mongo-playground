@@ -59,7 +59,9 @@ function createWorkerWindow() {
     workerWindow.webContents.openDevTools();
   }
   workerWindow.on("closed", function(event) {
-    createWorkerWindow();
+    if(mainWindow !== null){
+      createWorkerWindow();
+    }
   });
 }
 
