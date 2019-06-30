@@ -43,23 +43,26 @@ const exportOutput = log => {
 };
 
 const exportCSV = log => {
-  if (log && !log.length) {
-    log = [log];
-  }
-  log.forEach(el => {
-    try {
-      const fields = Object.keys(el.length ? el[0] : el);
-      const opts = { fields };
-      const parser = new Parser(opts);
-      const csv = parser.parse(el);
-      electron.downloadFile(csv, {
-        name: "csv",
-        extensions: ["csv"]
-      });
-    } catch (err) {
-      console.error(err);
+  try {
+    if (log && !log.length) {
+      log = [log];
     }
-  });
+    const fields = log.reduce(
+      (fields, obj) => [
+        ...new Set((fields = [...fields, ...Object.keys(obj)]))
+      ],
+      []
+    );
+    const opts = { fields };
+    const parser = new Parser(opts);
+    const csv = parser.parse(log);
+    electron.downloadFile(csv, {
+      name: "csv",
+      extensions: ["csv"]
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export default { codeFormat, exportCode, exportOutput, exportCSV };
